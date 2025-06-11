@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PoolManager : MonoBehaviour
 {
-    [Header("몬스터 프리팹들")]
+    [Header("monster Prefabs")]
     public GameObject[] monsterPrefabs;
 
-    [Header("총알, 무기 프리팹들")]
+    [Header("weapon Prefabs")]
     public GameObject[] bulletPrefabs;
 
-    [Header("경험치 프리팹들")]
+    [Header("Exp Prefabs")]
     public GameObject[] expPrefabs;
 
     private List<GameObject>[] monsterPools;
