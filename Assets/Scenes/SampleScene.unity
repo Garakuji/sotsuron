@@ -445,7 +445,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 2
+  orthographic size: 4.090909
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -750,6 +750,9 @@ MonoBehaviour:
   bulletPrefabs:
   - {fileID: 6845881158389993079, guid: 1f84651db5c277945b42c3d560e2942f, type: 3}
   - {fileID: 6567767059822912645, guid: 19330faecab42c04dba637185eb8d0c6, type: 3}
+  - {fileID: 1038495305713584777, guid: 19ac7e21bbd9f9147ab98b5f6cdfef2b, type: 3}
+  - {fileID: 6807884474918918983, guid: 6e1b627342e4548498bde6caa8ba4c62, type: 3}
+  - {fileID: 8387739482144470722, guid: eccf9fa248562d54fbe57d4afe169c66, type: 3}
   expPrefabs:
   - {fileID: 3652740744769963717, guid: b9fffe13713542c44aee71a3c29c8c56, type: 3}
 --- !u!1 &619394800
@@ -880,11 +883,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e29c8567db7e77f48911cd035b0b90d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
-  prefabId: 0
+  id: 2
+  prefabId: 2
   damage: 11
-  count: 0
-  speed: 0
+  count: 1
+  speed: 0.5
   player: {fileID: 1625504800}
 --- !u!1 &744836879
 GameObject:
@@ -1150,7 +1153,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameTime: 0
-  maxGameTime: 20
   health: 0
   maxHealth: 100
   level: 0
@@ -1792,11 +1794,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e29c8567db7e77f48911cd035b0b90d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 1
-  prefabId: 1
+  id: 4
+  prefabId: 4
   damage: 3
-  count: 0
-  speed: 0.3
+  count: 1
+  speed: 1
   player: {fileID: 1625504800}
 --- !u!4 &1425777424
 Transform:
@@ -18595,6 +18597,7 @@ MonoBehaviour:
   inputVec: {x: 0, y: 0}
   speed: 3
   scanner: {fileID: 0}
+  lastMoveDir: {x: 1, y: 0}
 --- !u!4 &1625504800 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6566254914135513985, guid: 14bc82c49e2f5124d86a487e9c1bdb97, type: 3}
@@ -19193,7 +19196,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: a1677043b9e322f4a81c9ceca33128e1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

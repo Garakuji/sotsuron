@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem.Utilities;
@@ -12,6 +12,9 @@ public class move_test : MonoBehaviour
     private SpriteRenderer spriter;
     private Animator anim;
 
+    [HideInInspector]
+    public Vector2 lastMoveDir = Vector2.right; // 마지막 방향 기본값은 오른쪽
+
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -19,11 +22,19 @@ public class move_test : MonoBehaviour
         anim = GetComponent<Animator>();
         scanner = GetComponent<Scanner>();
     }
+
     private void Update()
     {
         inputVec.x = Input.GetAxisRaw("Horizontal");
         inputVec.y = Input.GetAxisRaw("Vertical");
+
+        // 방향키가 눌렸을 때만 갱신
+        if (inputVec.sqrMagnitude > 0.01f)
+        {
+            lastMoveDir = inputVec.normalized;
+        }
     }
+
     private void FixedUpdate()
     {
         Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;

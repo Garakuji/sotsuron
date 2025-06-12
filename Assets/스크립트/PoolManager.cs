@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PoolManager : MonoBehaviour
 {
+
+    public static PoolManager Instance;
+
     [Header("monster Prefabs")]
     public GameObject[] monsterPrefabs;
 
@@ -19,6 +22,8 @@ public class PoolManager : MonoBehaviour
 
     private void Awake()
     {
+
+        Instance = this;
         // 몬스터 풀 초기화
         monsterPools = new List<GameObject>[monsterPrefabs.Length];
         for (int i = 0; i < monsterPrefabs.Length; i++)

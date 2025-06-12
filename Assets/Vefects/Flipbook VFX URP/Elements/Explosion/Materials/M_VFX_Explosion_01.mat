@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: aae2c8ab085dddb4d9130e1ab3348b5b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _PIXELATE_ON
   m_InvalidKeywords:
   - _RECEIVESHADOWS_OFF
   - _RECEIVE_SHADOWS_OFF
@@ -70,8 +71,8 @@ Material:
     - _ErosionSmoothness: 1
     - _FlatColor: 0
     - _Intensity: 0.4
-    - _Pixelate: 0
-    - _PixelsMultiplier: 2
+    - _Pixelate: 1
+    - _PixelsMultiplier: 5.52
     - _PixelsX: 128
     - _PixelsY: 128
     - _QueueControl: 0
@@ -97,3 +98,4 @@ Material:
     - _UVP: {r: 0, g: 0, b: 0, a: 0}
     - _UVS: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

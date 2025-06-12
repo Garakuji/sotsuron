@@ -29,7 +29,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 적이 아니면 무시
+        // 적이 아니툈E무시
         if (!collision.CompareTag("Enemy"))
             return;
 

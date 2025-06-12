@@ -7,14 +7,13 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     [Header("# Game Control")]
     public float GameTime;
-    public float maxGameTime = 2 * 10f;
     [Header("# Player Info")]
     public int health;
     public int maxHealth = 100;
     public int level;
     public int kill;
     public int exp;
-    public int[] nextExp = { 3, 5 , 10, 30, 60, 100, 150, 210, 280, 360, 450, 600 };
+    public int[] nextExp = { 10, 30, 60, 100, 150, 210, 280, 360, 450, 600 };
     [Header("# Game object")]
     public move_test player;
     public PoolManager Pool;
@@ -30,11 +29,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         GameTime += Time.deltaTime;
-
-        if (GameTime > maxGameTime)
-        {
-            GameTime = maxGameTime;
-        }
+    
     }
 
     public void GetExp(int amount = 1)
@@ -45,9 +40,6 @@ public class GameManager : MonoBehaviour
         {
             exp = 0;
             level++;
-
-            // 레벨업 처리
-            Debug.Log("레벨 업!");
         }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public float speed;
+    private float baseSpeed;
     public float health;
     public float maxHealth;
     public Rigidbody2D target;
@@ -12,6 +13,7 @@ public class Enemy : MonoBehaviour
     private Color[] originalColors;
     private bool isKnockback;
     private float knockbackTime = 0.1f;
+    private bool isBurning = false;
 
     bool isLive;
 
@@ -64,12 +66,19 @@ public class Enemy : MonoBehaviour
 
         anim.SetBool("isDeath", false);
 
-        // 충돌 및 타겟팅 다시 가능하도록 복구
         GetComponent<Collider2D>().enabled = true;
         gameObject.tag = "Enemy";
 
+        // 🔧 상태이상 색 초기화
+        for (int i = 0; i < spriters.Length; i++)
+        {
+            if (spriters[i] != null)
+                spriters[i].color = originalColors[i];
+        }
+
         StartCoroutine(AssignTargetLater());
     }
+
 
     IEnumerator AssignTargetLater()
     {
@@ -78,13 +87,14 @@ public class Enemy : MonoBehaviour
 
         target = GameManager.Instance.player.GetComponent<Rigidbody2D>();
     }
-
     public void Init(SpawnData data)
     {
+        baseSpeed = data.speed;   // 원래 속도 저장
         speed = data.speed;
         maxHealth = data.health;
         health = data.health;
     }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -128,20 +138,26 @@ public class Enemy : MonoBehaviour
 
     IEnumerator HitEffect()
     {
-        for (int i = 0; i < spriters.Length; i++)
+        for (int i = 0; i < 2; i++)
         {
-            if (spriters[i] != null)
-                spriters[i].color = Color.red; 
-        }
+            for (int j = 0; j < spriters.Length; j++)
+            {
+                if (spriters[j] != null)
+                    spriters[j].enabled = false;
+            }
 
-        yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.05f);
 
-        for (int i = 0; i < spriters.Length; i++)
-        {
-            if (spriters[i] != null)
-                spriters[i].color = originalColors[i]; // 복원
+            for (int j = 0; j < spriters.Length; j++)
+            {
+                if (spriters[j] != null)
+                    spriters[j].enabled = true;
+            }
+
+            yield return new WaitForSeconds(0.05f);
         }
     }
+
 
     void Dead()
     {
@@ -207,6 +223,91 @@ public class Enemy : MonoBehaviour
 
         rigid.linearVelocity = Vector2.zero;
         isLive = true;
+    }
+
+
+
+    public void ApplyBurn(float duration)
+    {
+        StartCoroutine(BurnEffect(duration));
+    }
+
+    private IEnumerator BurnEffect(float duration)
+    {
+        isBurning = true;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (!isSlowed)  // 슬로우 중이 아니면 빨간색
+            {
+                for (int i = 0; i < spriters.Length; i++)
+                    spriters[i].color = Color.red;
+            }
+
+            yield return new WaitForSeconds(0.2f);
+
+            if (!isSlowed)
+            {
+                for (int i = 0; i < spriters.Length; i++)
+                    spriters[i].color = originalColors[i];
+            }
+
+            yield return new WaitForSeconds(0.2f);
+            elapsed += 0.4f;
+        }
+
+        isBurning = false;
+
+        // 화상 종료 후 슬로우 상태면 파란색 유지, 아니면 원상복구
+        if (isSlowed)
+            SetWaterVisual();
+        else
+            ResetColor();
+    }
+
+
+    private bool isSlowed = false;
+
+    public void SetWaterVisual()
+    {
+        isSlowed = true;
+
+        // 화상이 활성화 중이라도 파란색을 우선시
+        for (int i = 0; i < spriters.Length; i++)
+        {
+            if (spriters[i] != null)
+                spriters[i].color = Color.blue;
+        }
+    }
+
+    public void ResetColor()
+    {
+        isSlowed = false;
+
+        // 화상이 동시에 있는 경우는 시각화 유지
+        if (isBurning)
+            return;
+
+        for (int i = 0; i < spriters.Length; i++)
+        {
+            if (spriters[i] != null)
+                spriters[i].color = originalColors[i];
+        }
+    }
+
+    public void ApplySlow(float ratio)
+    {
+        if (!isLive) return;
+
+        speed = baseSpeed * (1f - ratio); // 원래 속도를 기준으로 계산
+        SetWaterVisual();
+    }
+
+    public void RemoveSlow()
+    {
+        speed = baseSpeed; // 원래 속도로 복구
+        ResetColor();
     }
 
 
