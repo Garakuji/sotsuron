@@ -10,6 +10,9 @@ public class Weapon : MonoBehaviour
     public Transform player;
     private Vector3 offset;
     float timer;
+    private float waterTimer = 0f;
+    public GameObject waterVFXPrefab;
+
 
     void Start()
     {
@@ -62,24 +65,23 @@ public class Weapon : MonoBehaviour
                     fireballObj.GetComponent<Fireball>().Init(dir);
                 }
                 break;
-            case 4:  // WaterZone Attack
-                timer += Time.deltaTime;
-                if (timer > speed)
+
+            case 4: // 물속성 장판
+                waterTimer += Time.deltaTime;
+                if (waterTimer > speed)
                 {
-                    timer = 0f;
+                    waterTimer = 0f;
+                    Vector2 spawnPos = (Vector2)player.position + Random.insideUnitCircle * 2.5f;
 
-                    // 1. 랜덤 위치 선택
-                    Vector2 randPos = (Vector2)player.position + Random.insideUnitCircle * 3f;
+                    // VFX 먼저 재생
+                    GameObject vfx = Instantiate(waterVFXPrefab, spawnPos, Quaternion.identity);
+                    StartCoroutine(DisableAfterDelay(vfx, 1f));
 
-                    // 2. VFX 이펙트 먼저 소환
-                    GameObject vfx = GameManager.Instance.Pool.GetBullet(prefabId); // prefabId는 VFX 이펙트
-                    vfx.transform.position = randPos;
-                    vfx.SetActive(true);
-
-                    // 3. VFX 이후 장판 생성 (0.5초 후)
-                    StartCoroutine(SpawnWaterZoneAfterDelay(randPos, 0.5f));
+                    // 장판은 잠시 후에 생성
+                    StartCoroutine(SpawnWaterZoneAfterDelay(spawnPos));
                 }
                 break;
+
 
 
             default:
@@ -108,11 +110,40 @@ public class Weapon : MonoBehaviour
         switch (id)
         {
             case 0:
-                speed = -150;
-                Batch();
+                damage = 5f;
+                count = 1;
+                speed = -150f;
+                Batch();  // 회전 무기만
                 break;
+
+            case 1:
+                damage = 10f;
+                count = 1;
+                speed = 0.5f;
+                break;
+
+            case 2:
+                damage = 8f;
+                count = 3;
+                speed = 1.2f;
+                break;
+
+            case 3:
+                damage = 12f;
+                count = 1;
+                speed = 0.8f;
+                break;
+
+            case 4:
+                damage = 2f;  // 틱당 데미지
+                count = 3;    // 틱 횟수
+                speed = 2.5f; // 장판 쿨타임
+                break;
+
             default:
-                speed = 0.3f;
+                damage = 5f;
+                count = 1;
+                speed = 1f;
                 break;
         }
     }
@@ -142,17 +173,23 @@ public class Weapon : MonoBehaviour
             bullet.GetComponent<Bullet>().Init(damage, -1); // 무한 관통
         }
     }
-    IEnumerator SpawnWaterZoneAfterDelay(Vector2 pos, float delay)
+    IEnumerator SpawnWaterZoneAfterDelay(Vector2 pos)
     {
-        yield return new WaitForSeconds(delay);
-
-        GameObject zone = GameManager.Instance.Pool.GetBullet(prefabId + 1); // prefabId+1 = WaterZone 본체
+        yield return new WaitForSeconds(0.3f); // VFX 재생 시간
+        GameObject zone = GameManager.Instance.Pool.GetBullet(prefabId);
         zone.transform.position = pos;
         zone.SetActive(true);
-
-        // 장판 초기화
-        zone.GetComponent<WaterZone>().Init(damage, 3f, 0.3f,2f); // 기본값: 데미지, 지속시간, 슬로우율
+        zone.GetComponent<WaterZone>().Init(damage, count, 0.3f, 1.5f);
     }
+
+    private IEnumerator DisableAfterDelay(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (obj != null)
+            obj.SetActive(false);
+    }
+
+
 
     void FireTargeting()
     {

@@ -1,28 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(CircleCollider2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class WaterZone : MonoBehaviour
 {
-    private float tickDamage = 2f;
-    private float duration = 3f;
-    private float slowRatio = 0.3f;
-    private float tickInterval = 1f;
-    private float radius = 2f;
+    public float tickDamage;
+    public float slowRatio;
+    public float duration;
 
-    [SerializeField] private GameObject waterVFX; // 이펙트 프리팹
+    private CircleCollider2D circleCollider;
+    private SpriteRenderer spriteRenderer;
 
-    private void OnEnable()
+    void Awake()
     {
-        StartCoroutine(ZoneRoutine());
+        circleCollider = GetComponent<CircleCollider2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
-        if (waterVFX != null)
-        {
-            GameObject effect = Instantiate(waterVFX, transform.position, Quaternion.identity);
-            effect.transform.localScale = Vector3.one * radius;
-        }
+        circleCollider.isTrigger = true;
 
-        transform.localScale = Vector3.one * radius;
+        // Sprite의 크기를 기준으로 콜라이더 반지름 설정 (화면상 범위와 정확히 맞춤)
+        SyncColliderToSprite();
+    }
+
+    void SyncColliderToSprite()
+    {
+        if (spriteRenderer.sprite == null) return;
+
+        // Sprite의 절반 너비 (extents) == 반지름
+        float radiusWorld = spriteRenderer.bounds.extents.x;
+        circleCollider.radius = radiusWorld;
     }
 
     public void Init(float tickDamage, float duration, float slowRatio, float radius)
@@ -30,42 +36,70 @@ public class WaterZone : MonoBehaviour
         this.tickDamage = tickDamage;
         this.duration = duration;
         this.slowRatio = slowRatio;
-        this.radius = radius;
+
+        SyncColliderToSprite(radius); // 범위 정확하게 동기화
+
+        Invoke(nameof(Deactivate), duration);
     }
 
-    private IEnumerator ZoneRoutine()
+
+    private void SyncColliderToSprite(float desiredWorldRadius)
     {
-        float elapsed = 0f;
+        var col = GetComponent<CircleCollider2D>();
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr == null || col == null || sr.sprite == null) return;
 
-        while (elapsed < duration)
-        {
-            ApplyEffects();
-            yield return new WaitForSeconds(tickInterval);
-            elapsed += tickInterval;
-        }
+        // ✅ 항상 기본 스케일로 초기화한 후 계산 (중복 계산 방지)
+        transform.localScale = Vector3.one;
 
-        gameObject.SetActive(false);
+        float currentSpriteWorldRadius = sr.bounds.extents.x;
+        float scale = desiredWorldRadius / currentSpriteWorldRadius;
+
+        transform.localScale = Vector3.one * scale;
+
+        // 콜라이더는 sprite bounds가 아닌 원본 sprite 기준으로
+        col.radius = sr.sprite.bounds.extents.x;
     }
 
-    private void ApplyEffects()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius / 2f, LayerMask.GetMask("Enemy"));
-
-        foreach (Collider2D col in hits)
+        if (other.CompareTag("Enemy"))
         {
-            Enemy enemy = col.GetComponent<Enemy>();
+            var enemy = other.GetComponent<Enemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(tickDamage);
                 enemy.ApplySlow(slowRatio);
-                StartCoroutine(ResetAfterDelay(enemy, tickInterval)); // 슬로우 제거 예약
+                enemy.TakeDamage(tickDamage);
             }
         }
     }
 
-    private IEnumerator ResetAfterDelay(Enemy enemy, float delay)
+    private void OnTriggerStay2D(Collider2D other)
     {
-        yield return new WaitForSeconds(delay);
-        enemy.RemoveSlow();
+        if (other.CompareTag("Enemy"))
+        {
+            var enemy = other.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.ApplySlow(slowRatio);
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            var enemy = other.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.RemoveSlow();
+            }
+        }
+    }
+
+    private void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 }

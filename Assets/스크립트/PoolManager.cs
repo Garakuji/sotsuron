@@ -16,9 +16,12 @@ public class PoolManager : MonoBehaviour
     [Header("Exp Prefabs")]
     public GameObject[] expPrefabs;
 
+
+
     private List<GameObject>[] monsterPools;
     private List<GameObject>[] bulletPools;
     private List<GameObject>[] expPools;
+
 
     private void Awake()
     {
@@ -38,6 +41,7 @@ public class PoolManager : MonoBehaviour
         expPools = new List<GameObject>[expPrefabs.Length];
         for (int i = 0; i < expPrefabs.Length; i++)
             expPools[i] = new List<GameObject>();
+
     }
 
     public GameObject GetMonster(int index)
@@ -108,4 +112,5 @@ public class PoolManager : MonoBehaviour
 
         return select;
     }
+
 }
