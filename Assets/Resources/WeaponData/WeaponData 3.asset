@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 3
   prefabId: 3
-  weaponName: sdf
-  description: sdf
   icon: {fileID: 21300000, guid: 0b0921a54227d2e4ebf7a2715c241427, type: 3}
+  description: sdf
+  prefab: {fileID: 3281136444390060596, guid: 8381eea44136fa44d800888aed760905, type: 3}

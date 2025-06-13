@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 08f0f0c6dbba83f478f1c284d004b146, type: 3}
-  m_Name: WeaponData
+  m_Name: WeaponData 0
   m_EditorClassIdentifier: 
   id: 0
   prefabId: 0
-  weaponName: asdf
-  description: asdf
   icon: {fileID: 21300000, guid: 02de1ff20dcb25e4eb10fd08f3f52393, type: 3}
+  description: asdf
+  prefab: {fileID: 4168084179589891358, guid: 692e340f4309a05449ffda350b3d5e45, type: 3}

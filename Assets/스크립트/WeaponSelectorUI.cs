@@ -1,15 +1,60 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WeaponSelectorUI : MonoBehaviour
 {
-    public Weapon weapon;
-    public WeaponSlotUI[] slotUIs; // Inspector¿¡ ¿¬°áÇÒ 3°³ ½½·Ô
+    public Weapon weapon;  // Inspectorì—ì„œ í• ë‹¹
+    public WeaponSlotUI[] slotUIs;
+
+    void Start()
+    {
+        Hide();
+    }
+    public void OnWeaponSelected(WeaponData data)
+    {
+        if (data == null) { Debug.LogError("WeaponData null"); return; }
+        
+        if (data == null)
+        {
+            Debug.LogError("ì„ íƒëœ WeaponDataê°€ nullì…ë‹ˆë‹¤.");
+            return;
+        }
+
+        if (weapon == null)
+        {
+            weapon = FindAnyObjectByType<Weapon>();
+            if (weapon == null)
+            {
+                Debug.LogError("Weapon ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return;
+            }
+        }
+
+
+        if (weapon.id == data.id)
+        {
+            Debug.Log("ì´ë¯¸ ì´ ë¬´ê¸° IDê°€ ì„¤ì •ë˜ì–´ ìˆìŠµë‹ˆë‹¤. ë ˆë²¨ì—…ë§Œ í•©ë‹ˆë‹¤.");
+            weapon.Levelup(weapon.damage + 5f, weapon.count + 1);
+        }
+        else
+        {
+            weapon.id = data.id;
+            weapon.prefabId = data.prefabId;
+            weapon.Init();
+        }
+            Time.timeScale = 1f;
+            Hide();
+
+            // WeaponManagerì— ìœ„ì„
+            WeaponManager.Instance.AddOrLevelupWeapon(data);
+    }
 
     public void Show(List<WeaponData> choices)
     {
         gameObject.SetActive(true);
         Time.timeScale = 0f;
+
         for (int i = 0; i < slotUIs.Length; i++)
         {
             if (i < choices.Count)
@@ -18,32 +63,10 @@ public class WeaponSelectorUI : MonoBehaviour
                 slotUIs[i].gameObject.SetActive(false);
         }
     }
-
-    private void Start()
-    {
-        Hide();
-    }
     public void Hide()
     {
         gameObject.SetActive(false);
-    }
-
-    public void OnWeaponSelected(WeaponData data)
-    {
-        // »õ·Î¿î Weapon ¿ÀºêÁ§Æ® »ı¼º
-        GameObject newWeaponObj = new GameObject("Weapon_" + data.id);
-        newWeaponObj.transform.SetParent(GameManager.Instance.player.transform);
-        newWeaponObj.transform.localPosition = Vector3.zero;
-
-        Weapon weapon = newWeaponObj.AddComponent<Weapon>();
-        weapon.player = GameManager.Instance.player.transform;
-        weapon.id = data.id;
-        weapon.prefabId = data.prefabId;
-        weapon.Init();
-
-        Hide();
         Time.timeScale = 1f;
     }
-
 
 }

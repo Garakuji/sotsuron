@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     {
         health = maxHealth;
         allWeaponData = new List<WeaponData>(Resources.LoadAll<WeaponData>("WeaponData"));
+        Debug.Log(allWeaponData.Count);
     }
 
     private void Update()
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    private List<WeaponData> GetRandomWeapons(int count)
+    public List<WeaponData> GetRandomWeapons(int count)
     {
         List<WeaponData> result = new();
         List<WeaponData> candidates = new(allWeaponData);

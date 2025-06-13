@@ -5,8 +5,8 @@ public class WeaponData : ScriptableObject
 {
     public int id;
     public int prefabId;
-    public string weaponName;
-    public string description;
     public Sprite icon;
+    public string description;
+    public GameObject prefab;
 }
 

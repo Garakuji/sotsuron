@@ -38,8 +38,14 @@ public class Enemy : MonoBehaviour
         gameObject.tag = "Enemy";
         anim.SetBool("isDeath", false);
         GetComponent<Collider2D>().enabled = true;
-
-        ResetColor();
+        for (int i = 0; i < spriters.Length; i++)
+        {
+            if (spriters[i] != null)
+            {
+                spriters[i].enabled = true; // ✅ 반드시 초기화
+                spriters[i].color = originalColors[i]; // ✅ 색상도 초기화
+            }
+        }
         StartCoroutine(AssignTarget());
     }
 
@@ -91,16 +97,16 @@ public class Enemy : MonoBehaviour
             Die();
     }
 
-    IEnumerator HitFlash()
+ IEnumerator HitFlash()
+{
+    for (int i = 0; i < 2; i++)
     {
-        for (int i = 0; i < 2; i++)
-        {
-            foreach (var s in spriters) s.enabled = false;
-            yield return new WaitForSeconds(0.05f);
-            foreach (var s in spriters) s.enabled = true;
-            yield return new WaitForSeconds(0.05f);
-        }
+        foreach (var s in spriters) s.enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        foreach (var s in spriters) s.enabled = true;
+        yield return new WaitForSeconds(0.05f);
     }
+}
 
     void Die()
     {
