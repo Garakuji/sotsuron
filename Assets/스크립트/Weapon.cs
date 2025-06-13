@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -36,12 +36,14 @@ public class Weapon : MonoBehaviour
         switch (id)
         {
             case 0:
-                // 회전 무기: 플레이어를 중심으로 궤도 회전
+                // 1) 플레이어 중심으로 위치를 옮기고
                 transform.position = player.position;
+                // 2) speed 값의 절대치를 사용해 시계 방향으로 회전
+                float rotSpeed = Mathf.Abs(speed);
                 transform.RotateAround(
                     player.position,
-                    Vector3.forward,
-                    speed * Time.deltaTime
+                    Vector3.forward,       // z축 기준
+                    -rotSpeed * Time.deltaTime
                 );
                 break;
 
