@@ -46,8 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   prefabId: 0
+  level: 1
   damage: 0
   count: 0
   speed: 0
+  bladePrefab: {fileID: 6845881158389993079, guid: 1f84651db5c277945b42c3d560e2942f, type: 3}
+  bladeDistance: 1.5
   player: {fileID: 0}
   waterVFXPrefab: {fileID: 3202966061077336156, guid: 18268fb0e3ce48b4f973fd0b6ac66693, type: 3}
+  lightningVFXPrefab: {fileID: 0}

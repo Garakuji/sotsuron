@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf51116bde7c654689da9e68a8607cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 0}
+  allWeaponDatas: []
   slotUIs:
   - {fileID: 628662576}
   - {fileID: 994352608}
@@ -1858,7 +1858,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 052f7cda270419f4f81c088b274ba852, type: 2}
   - {fileID: 11400000, guid: 24d9fedba5682304ea956db49dab666d, type: 2}
   - {fileID: 11400000, guid: 9c91f0897149c8e42ba74d911708bd14, type: 2}
-  weaponParent: {fileID: 1625504800}
 --- !u!4 &1052019191
 Transform:
   m_ObjectHideFlags: 0
@@ -36405,7 +36404,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3b63cd9d8d9931d4db8b8dd956bba9d6, type: 2}
+  - {fileID: 2100000, guid: 0f6654e07ca442845970a99db9363104, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

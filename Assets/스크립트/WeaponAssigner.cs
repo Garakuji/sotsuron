@@ -1,39 +1,25 @@
+// WeaponAssigner.cs
 using UnityEngine;
 
-public class WeaponSpawner : MonoBehaviour
+[DefaultExecutionOrder(-100)]
+public class WeaponAssigner : MonoBehaviour
 {
-    [Header("무기 선택용 데이터 리스트")]
-    public WeaponData[] allWeaponDatas;   // 에디터에서 각종 무기 Data 에셋을 등록
-
-    [Header("생성된 무기를 붙일 부모 (플레이어)")]
-    public Transform weaponParent;
+    [Header("랜덤 지급할 무기 Data 리스트")]
+    public WeaponData[] allWeaponDatas;  // 에디터에서 모든 무기 Data 에셋을 등록
 
     void Start()
     {
         if (allWeaponDatas == null || allWeaponDatas.Length == 0)
         {
-            Debug.LogError("[WeaponSpawner] allWeaponDatas가 비어 있습니다.");
+            Debug.LogError("[WeaponAssigner] allWeaponDatas가 비어 있습니다.");
             return;
         }
 
-        // 1) 랜덤 Data 고르기
+        // 0~(Length-1) 사이 랜덤 인덱스
         int idx = Random.Range(0, allWeaponDatas.Length);
         WeaponData data = allWeaponDatas[idx];
 
-        // 2) 프리팹 Instantiate
-        GameObject go = Instantiate(data.prefab, weaponParent.position, Quaternion.identity, weaponParent);
-        Weapon w = go.GetComponent<Weapon>();
-        if (w == null)
-        {
-            Debug.LogError("[WeaponSpawner] Weapon 컴포넌트가 없습니다.");
-            return;
-        }
-
-        // 3) ID/PF 설정 및 초기화
-        w.id = data.id;
-        w.prefabId = data.prefabId;
-        w.player = weaponParent;
-        w.Init();
-        w.ResetOffset();
+        // WeaponManager에게 위임하면, 자동으로 Instantiate 및 Init 해 줌
+        WeaponManager.Instance.AddOrLevelupWeapon(data);
     }
 }
