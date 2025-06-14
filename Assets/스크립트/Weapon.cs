@@ -97,6 +97,11 @@ public class Weapon : MonoBehaviour
                 waterTimer = 0f;
                 SpawnWaterZone();
             }
+
+           /* else if (id == 10) // Toxic Thorns
+            {
+                InvokeRepeating(nameof(FireToxicThorns), 1f, 2.5f); // 2.5초마다 발동
+            }*/
         }
     }
 
@@ -121,12 +126,12 @@ public class Weapon : MonoBehaviour
         {
             case 0:
                 damage = 5f + 2f * (level - 1);
-                count = 1 + ((level >= 3)?1:0) + ((level >= 5)?1:0);
+                count = 1 + ((level >= 3) ? 1 : 0) + ((level >= 5) ? 1 : 0);
                 speed = 150f;
                 break;
             case 1:
                 damage = 10f + 3f * (level - 1);
-                count = 1 + ((level >= 3)?1:0) + ((level >= 5)?1:0);
+                count = 1 + ((level >= 3) ? 1 : 0) + ((level >= 5) ? 1 : 0);
                 speed = 0.5f;
                 break;
             case 2:
@@ -167,13 +172,13 @@ public class Weapon : MonoBehaviour
         // 기존 블레이드 제거
         for (int i = transform.childCount - 1; i >= 0; i--)
             Destroy(transform.GetChild(i).gameObject);
-        
+
         // 새로운 블레이드 생성 및 데미지 초기화
         Vector3 pivot = player.position + Vector3.up * pivotYOffset;
         for (int i = 0; i < count; i++)
         {
             GameObject blade = Instantiate(bladePrefab, pivot, Quaternion.identity, transform);
-            Vector3 dir = Quaternion.Euler(0f,0f,360f * i / count) * Vector3.up;
+            Vector3 dir = Quaternion.Euler(0f, 0f, 360f * i / count) * Vector3.up;
             blade.transform.position = pivot + dir * bladeDistance;
             blade.transform.localScale = _bladeOriginalScale;
             // Blade에 Bullet 컴포넌트가 있다면 데미지와 관통 설정
@@ -185,19 +190,58 @@ public class Weapon : MonoBehaviour
 
     void FireTrackingArrows()
     {
-        var scanner = player.GetComponent<move_test>()?.scanner;
-        if (scanner == null || scanner.nearestTarget == null) return;
-        
-        Vector3 dir = (scanner.nearestTarget.position - transform.position).normalized;
-        float baseAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 45f; // +45° 보정
-        float spread = 30f;
-        for (int i = 0; i < count; i++)
+        // 1) MoveTest 経由で Scanner を取得
+        var moveTest = player.GetComponent<move_test>();
+        if (moveTest == null)
         {
-            float ang = baseAngle + spread * (i - (count - 1) / 2f);
+            Debug.LogError("MoveTest がアタッチされていません");
+            return;
+        }
+
+        var scanner = moveTest.scanner;
+        if (scanner == null)
+        {
+            Debug.LogError("Scanner がセットされていません");
+            return;
+        }
+
+        // 2) 最寄りターゲットを取得
+        var target = scanner.nearestTarget;
+        if (target == null)
+        {
+            // 範囲内に敵がいなければ発射しない
+            return;
+        }
+
+        // 3) ターゲット方向の単位ベクトルと角度を計算
+        Vector3 dir = (target.position - transform.position).normalized;
+        float baseAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // 4) スプレッド（扇状）をかけたい場合はオフセットを足す
+        float spread = 30f;
+        int n = count;
+
+        float denom = n - 1;          // 분모
+
+        for (int i = 0; i < n; i++)
+        {
+            // count==1 이면 offset=0
+            float offset = denom == 0
+                ? 0f
+                : spread * (i - denom / 2f) / denom;
+
+            float ang = baseAngle + offset;
+
             var b = GameManager.Instance.Pool.GetBullet(prefabId);
             b.transform.position = transform.position;
-            b.transform.rotation = Quaternion.Euler(0f,0f,ang);
-            b.GetComponent<Bullet>().Init(damage,1,new Vector3(Mathf.Cos(ang*Mathf.Deg2Rad), Mathf.Sin(ang*Mathf.Deg2Rad),0f),10f);
+            b.transform.rotation = Quaternion.Euler(0f, 0f, ang - 45f);
+
+            Vector3 velocity = new Vector3(
+                Mathf.Cos(ang * Mathf.Deg2Rad),
+                Mathf.Sin(ang * Mathf.Deg2Rad),
+                0f
+            );
+            b.GetComponent<Bullet>().Init(damage, 1, velocity, 10f);
         }
     }
 
@@ -244,4 +288,28 @@ public class Weapon : MonoBehaviour
         yield return new WaitForSeconds(d);
         if (obj) Destroy(obj);
     }
+
+    /*void FireToxicThorns()
+    {
+        // 일정 범위 내의 적들을 찾아서 가시 생성
+        Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 1.5f, LayerMask.GetMask("Enemy"));
+
+        foreach (var target in targets)
+        {
+            // 이펙트 생성 (선택사항)
+            GameObject thorn = Instantiate(Resources.Load<GameObject>("Effect/ToxicThorn"), target.transform.position, Quaternion.identity);
+
+            // 데미지 및 중독 처리
+            Enemy enemy = target.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage); // 기본 데미지
+                if (!enemy.gameObject.GetComponent<PoisonEffect>())
+                {
+                    PoisonEffect poison = enemy.gameObject.AddComponent<PoisonEffect>();
+                    poison.Apply(damage * 0.3f, 3f, 0.5f); // 중독 데미지, 지속 시간, 틱 간격
+                }
+            }
+        }
+    }*/
 }

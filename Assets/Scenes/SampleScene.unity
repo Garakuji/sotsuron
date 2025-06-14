@@ -357,7 +357,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf51116bde7c654689da9e68a8607cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allWeaponDatas: []
   slotUIs:
   - {fileID: 628662576}
   - {fileID: 994352608}
@@ -734,7 +733,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 4.090909
+  orthographic size: 2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1620,7 +1619,8 @@ MonoBehaviour:
   level: 0
   kill: 0
   exp: 0
-  nextExp: 03000000050000000a0000001e0000003c0000006400000096000000d20000001801000068010000c201000058020000
+  expBase: 10
+  expGrowthRate: 1.2
   player: {fileID: 1625504797}
   Pool: {fileID: 593586848}
   weaponSelector: {fileID: 357606251}
@@ -19646,8 +19646,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 467d10769d5b7d24bb24a44476d7892d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: []
-  monsterPrefabs: []
+  spawnPoints: []
+  startInterval: 0.5
+  intervalRampLevel: 30
+  endInterval: 0.2
+  baseSpeedRatio: 0.5
+  speedRatioIncrement: 0.05
 --- !u!1 &1768161678
 GameObject:
   m_ObjectHideFlags: 0

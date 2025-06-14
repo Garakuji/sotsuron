@@ -8,8 +8,8 @@ public class HUD : MonoBehaviour
     public enum InfoType { Exp, Level, Kill, Time, Health }
     public InfoType type;
 
-    Text myText;
-    Slider mySlider;
+    private Text myText;
+    private Slider mySlider;
 
     private void Awake()
     {
@@ -19,30 +19,38 @@ public class HUD : MonoBehaviour
 
     private void LateUpdate()
     {
-        switch (type) {
+        switch (type)
+        {
             case InfoType.Exp:
+                // 현재 경험치
                 float curExp = GameManager.Instance.exp;
-                float maxExp = GameManager.Instance.nextExp[GameManager.Instance.level];
-                mySlider.value = curExp / maxExp;
+                // 다음 레벨업에 필요한 경험치 (함수 호출)
+                int lvl = GameManager.Instance.level;
+                int needExp = GameManager.Instance.GetRequiredExp(lvl);
+                // 슬라이더에 비율 세팅
+                mySlider.value = curExp / (float)needExp;
                 break;
+
             case InfoType.Level:
-                myText.text = string.Format("Lv.{0:F0}", GameManager.Instance.level) ;
+                myText.text = string.Format("Lv.{0}", GameManager.Instance.level);
                 break;
+
             case InfoType.Kill:
-                myText.text = string.Format("{0:F0}", GameManager.Instance.kill);
+                myText.text = string.Format("{0}", GameManager.Instance.kill);
                 break;
+
             case InfoType.Time:
-                float elapsedTime = GameManager.Instance.GameTime;
-                int min = Mathf.FloorToInt(elapsedTime / 60);
-                int sec = Mathf.FloorToInt(elapsedTime % 60);
+                float elapsed = GameManager.Instance.GameTime;
+                int min = Mathf.FloorToInt(elapsed / 60f);
+                int sec = Mathf.FloorToInt(elapsed % 60f);
                 myText.text = string.Format("{0:D2}:{1:D2}", min, sec);
                 break;
+
             case InfoType.Health:
-                float curHealth = GameManager.Instance.health;
-                float maxHealth = GameManager.Instance.maxHealth;
-                mySlider.value = curHealth / maxHealth;
+                float curHp = GameManager.Instance.health;
+                float maxHp = GameManager.Instance.maxHealth;
+                mySlider.value = curHp / maxHp;
                 break;
         }
-
     }
 }
