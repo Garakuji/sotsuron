@@ -50,16 +50,25 @@ public class GameManager : MonoBehaviour
 
     public void GetExp(int amount = 1)
     {
+        Debug.Log($"[GameManager] GetExp called with {amount}. Current EXP: {exp}, Level: {level}");
         exp += amount;
 
-        // 레벨업에 필요한 경험치가 expBase * expGrowthRate^level 로 계산됩니다.
-        int need = GetRequiredExp(level);
-        if (exp >= need)
+        bool leveledUp = false;
+
+        while (exp >= GetRequiredExp(level))
         {
-            exp -= need;
+
+            Debug.Log($"[GameManager] Level UP! Current Level: {level} → {level + 1}");
+            exp -= GetRequiredExp(level);
             level++;
-            ShowLevelUpChoices();
+            leveledUp = true;
+
+            // 경험치 과다 누적으로 여러 번 레벨업될 수 있으므로 루프
+            // 단, 무기 선택 UI는 한 번만 호출
         }
+
+        if (leveledUp)
+            ShowLevelUpChoices(); // ✅ UI는 한 번만 열림
     }
 
     private void ShowLevelUpChoices()

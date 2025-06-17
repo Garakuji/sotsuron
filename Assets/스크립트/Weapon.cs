@@ -1,26 +1,29 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Weapon : MonoBehaviour
 {
     public int id;
     public int prefabId;
     public int level = 1;
-    public const int maxLevel = 5;
+    public const int maxLevel = 7;
 
     public float damage;
     public int count;
-    public float speed;
+    public float speed;  // attack cooldown
 
-    // 회전 무기 전용
-    public GameObject bladePrefab;       // Inspector에 Blade 프리팹 할당
-    public float bladeDistance = 1.5f;   // 회전 반지름
-    public float pivotYOffset = 0.3f;    // 플레이어 기준 높이 오프셋
+    // Blade weapon (id==0)
+    public GameObject bladePrefab;
+    public float bladeDistance = 1.5f;
+    public float pivotYOffset = 0.3f;
     private Vector3 _bladeOriginalScale;
 
-    // Offset for non-rotating weapons
+    // Offset for other weapons
     private Vector3 offset;
     private float timer;
+    private float scissorTimer;
     private float waterTimer;
 
     private float burnTickDamage;
@@ -30,6 +33,17 @@ public class Weapon : MonoBehaviour
 
     public Transform player;
     public GameObject waterVFXPrefab;
+
+    // Thread Trap stats
+    public float scissorSpeed = 5f;
+    public float scissorMaxLife = 3.0f;
+    public float scissorDirectDamage = 1f;       // 기본 직접 대미지 낮춤
+
+    [Header("Thread Trap Trail DOT")]
+    public float scissorTrailDotDamage = 1f;
+    public float scissorDotInterval = 0.5f;
+    public float scissorTrailRadius = 0.3f;
+    // trailDuration 대신 scissorMaxLife 사용
 
     private Vector3 _originalScale;
 
@@ -54,54 +68,96 @@ public class Weapon : MonoBehaviour
             }
         }
         else
+        {
             SetOffset();
+        }
     }
 
     void Update()
     {
-        if (player == null) return;
+            if (player == null) return;
 
-        if (id == 0)
-        {
-            // 회전 무기: pivot 위치에 고정
-            Vector3 pivot = player.position + Vector3.up * pivotYOffset;
-            transform.position = pivot;
-            transform.localScale = _originalScale;
-            // 자식 블레이드만 회전
-            foreach (Transform blade in transform)
+            switch (id)
             {
-                blade.RotateAround(pivot, Vector3.forward, speed * Time.deltaTime);
-                blade.localScale = _bladeOriginalScale;
-            }
-        }
-        else
-        {
-            FollowPlayer();
-            if (id == 1 && (timer += Time.deltaTime) > speed)
-            {
-                timer = 0f;
-                FireTrackingArrows();
-            }
-            else if (id == 2 && (timer += Time.deltaTime) > speed)
-            {
-                timer = 0f;
-                FireLightningBolts();
-            }
-            else if (id == 3 && (timer += Time.deltaTime) > speed)
-            {
-                timer = 0f;
-                FireFireball();
-            }
-            else if (id == 4 && (waterTimer += Time.deltaTime) > speed)
-            {
-                waterTimer = 0f;
-                SpawnWaterZone();
-            }
+                case 0:
+                    Vector3 pivot = player.position + Vector3.up * pivotYOffset;
+                    transform.position = pivot;
+                    transform.localScale = _originalScale;
+                    foreach (Transform blade in transform)
+                    {
+                        blade.RotateAround(pivot, Vector3.forward, speed * Time.deltaTime);
+                        blade.localScale = _bladeOriginalScale;
+                    }
+                    break;
 
-           /* else if (id == 10) // Toxic Thorns
-            {
-                InvokeRepeating(nameof(FireToxicThorns), 1f, 2.5f); // 2.5초마다 발동
-            }*/
+                case 1:
+                    FollowPlayer();
+                    if ((timer += Time.deltaTime) > speed)
+                    {
+                        timer = 0f;
+                        FireTrackingArrows();
+                    }
+                    break;
+
+                case 2:
+                    FollowPlayer();
+                    if ((timer += Time.deltaTime) > speed)
+                    {
+                        timer = 0f;
+                        FireLightningBolts();
+                    }
+                    break;
+
+                case 3:
+                    FollowPlayer();
+                    if ((timer += Time.deltaTime) > speed)
+                    {
+                        timer = 0f;
+                        FireFireball();
+                    }
+                    break;
+
+                case 4:
+                    FollowPlayer();
+                    if ((waterTimer += Time.deltaTime) > speed)
+                    {
+                        waterTimer = 0f;
+                        SpawnWaterZone();
+                    }
+                    break;
+
+                case 5:
+                    FollowPlayer();
+                    if ((timer += Time.deltaTime) > speed)
+                    {
+                        timer = 0f;
+                        FireToxicThorns();
+                    }
+                    break;
+
+                case 6:
+                    FollowPlayer();
+                    if ((timer += Time.deltaTime) > speed)
+                    {
+                        timer = 0f;
+                        FireScythe();
+                    }
+                    break;
+
+            case 7: // Thread Trap
+                FollowPlayer();
+                scissorTimer += Time.deltaTime;
+                if (scissorTimer > speed)
+                {
+                    scissorTimer = 0f;
+                    FireScissor();
+                }
+                break;
+
+            default:
+                FollowPlayer();
+                break;
+
         }
     }
 
@@ -111,7 +167,7 @@ public class Weapon : MonoBehaviour
         level++;
         ApplyLevelStats();
         if (id == 0)
-            Batch(); // 블레이드 수 재설정
+            Batch();
     }
 
     private void ApplyBaseStats()
@@ -126,30 +182,57 @@ public class Weapon : MonoBehaviour
         {
             case 0:
                 damage = 5f + 2f * (level - 1);
-                count = 1 + ((level >= 3) ? 1 : 0) + ((level >= 5) ? 1 : 0);
+                count = 1 + ((level >= 2) ? 1 : 0) + ((level >= 3) ? 1 : 0) + ((level >= 4) ? 1 : 0);
                 speed = 150f;
                 break;
+
             case 1:
                 damage = 10f + 3f * (level - 1);
-                count = 1 + ((level >= 3) ? 1 : 0) + ((level >= 5) ? 1 : 0);
+                count = 1 + ((level >= 2) ? 1 : 0) + ((level >= 3) ? 1 : 0) + ((level >= 4) ? 1 : 0);
                 speed = 0.5f;
                 break;
+
             case 2:
                 damage = 8f + 1f * (level - 1);
                 count = 3;
                 speed = 1.2f - 0.02f * (level - 1);
                 break;
+
             case 3:
                 damage = 12f + 2f * (level - 1);
                 burnTickDamage = 2f + 1f * (level - 1);
                 speed = 0.8f;
                 break;
+
             case 4:
                 zoneTickDamage = 3f;
                 zoneDuration = 3.0f + 0.5f * (level - 1);
-                zoneRadius = 2.0f + 0.5f * (level - 1);
+                zoneRadius = 1.0f + 0.5f * (level - 1);
                 damage = zoneTickDamage;
                 speed = 2.5f;
+                break;
+
+            case 5:
+                damage = 6f + 2f * (level - 1);
+                burnTickDamage = damage * 0.3f + level;
+                zoneDuration = 3f + 0.3f * (level - 1);
+                speed = Mathf.Max(3.0f - 0.2f * (level - 1), 0.5f);
+                break;
+
+            case 6:
+                damage = 10f + 3f * (level - 1);
+                count = 1 + ((level >= 2) ? 1 : 0);
+                speed = Mathf.Max(1.5f - 0.2f * (level - 1), 0.5f);
+                break;
+
+            case 7: // Thread Trap stats
+                scissorDirectDamage = 3f + 0.5f * (level - 1);
+                scissorTrailDotDamage = 3f + 0.5f * (level - 1);
+                scissorMaxLife = 3.0f + 0.5f * (level - 1);
+                speed = scissorSpeed = 5f + 2f * (level - 1);
+                scissorDotInterval = Mathf.Max(0.5f - 0.05f * (level - 1), 0.2f);
+                // 레벨 증가에 따른 최대 발사 개수 제한: 최대 4
+                count = Mathf.Min(level, 4);
                 break;
         }
     }
@@ -289,27 +372,112 @@ public class Weapon : MonoBehaviour
         if (obj) Destroy(obj);
     }
 
-    /*void FireToxicThorns()
+    void FireToxicThorns()
     {
-        // 일정 범위 내의 적들을 찾아서 가시 생성
+        // 플레이어 주변 적 감지
         Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 1.5f, LayerMask.GetMask("Enemy"));
 
-        foreach (var target in targets)
-        {
-            // 이펙트 생성 (선택사항)
-            GameObject thorn = Instantiate(Resources.Load<GameObject>("Effect/ToxicThorn"), target.transform.position, Quaternion.identity);
+        // 레벨에 비례해 공격할 대상 수 제한
+        int maxTargets = Mathf.Min(level, targets.Length);
 
-            // 데미지 및 중독 처리
-            Enemy enemy = target.GetComponent<Enemy>();
-            if (enemy != null)
+        for (int i = 0; i < maxTargets; i++)
+        {
+            var target = targets[i];
+            Vector3 basePos = target.transform.position;
+            int thornCount = 3;
+            float spreadRadius = 0.3f;
+
+            for (int j = 0; j < thornCount; j++)
             {
-                enemy.TakeDamage(damage); // 기본 데미지
-                if (!enemy.gameObject.GetComponent<PoisonEffect>())
+                Vector2 offset = Random.insideUnitCircle * spreadRadius;
+                Vector3 spawnPos = basePos + new Vector3(offset.x, offset.y, 0f);
+
+                // ▶ PoolManager를 통한 프리팹 생성으로 수정
+                GameObject thorn = GameManager.Instance.Pool.GetBullet(prefabId);
+                thorn.transform.position = spawnPos;
+                thorn.SetActive(true);
+
+                // ▶ 데미지 및 중독 정보 전달
+                var poisonComp = thorn.GetComponent<PoisonThorn>();
+                if (poisonComp != null)
                 {
-                    PoisonEffect poison = enemy.gameObject.AddComponent<PoisonEffect>();
-                    poison.Apply(damage * 0.3f, 3f, 0.5f); // 중독 데미지, 지속 시간, 틱 간격
+                    poisonComp.Init(damage, damage * 0.1f, 3f, 0.5f);  // 독 데미지 낮춤
                 }
             }
         }
-    }*/
+    }
+    void FireScythe()
+    {
+        // 0) 파라미터: 필요에 따라 이 값을 조정하세요
+        float offsetDist = -1.2f;  // <-- 예전 0.8f보다 멀리 띄움
+
+        // 1) 플레이어가 진짜 어디를 보고 있는지 판별
+        //    (player 스프라이트를 flipX 로 좌우 반전시킨다고 가정)
+        bool facingRight = player.localScale.x > 0f;
+
+        // 2) 스폰 위치 계산 (플레이어 앞 방향으로만)
+        Vector3 spawnPos = player.position + Vector3.right * (facingRight ? offsetDist : -offsetDist);
+
+        // 3) 풀에서 낫 오브젝트 꺼내기
+        GameObject scythe = GameManager.Instance.Pool.GetBullet(prefabId);
+        scythe.transform.position = spawnPos;
+        scythe.transform.rotation = Quaternion.identity;
+
+        // 4) 재사용 꼬임 방지: 항상 기본 스케일로 초기화
+        scythe.transform.localScale = Vector3.one;
+
+        // 5) 전체 오브젝트를 localScale.x 로만 플립
+        scythe.transform.localScale = new Vector3(facingRight ? 1f : -1f, 1f, 1f);
+
+        // 6) 콜라이더 Offset 보정 (콜라이더가 루트에 붙어 있다고 가정)
+        var col = scythe.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            Vector2 off = col.offset;
+            off.x = Mathf.Abs(off.x) * (facingRight ? 1f : -1f);
+            col.offset = off;
+        }
+
+        // 7) 데미지 초기화 및 활성화
+        var comp = scythe.GetComponent<Scythe>();
+        if (comp != null) comp.Init(damage);
+        scythe.SetActive(true);
+    }
+
+    /// <summary>
+    /// Thread Trap 발사
+    /// </summary>
+    void FireScissor()
+    {
+        Vector2 baseDir = player.GetComponent<move_test>().lastMoveDir;
+        if (baseDir == Vector2.zero) baseDir = Vector2.right;
+
+        for (int i = 0; i < count; i++)
+        {
+            // 발사 방향에 약간의 분산 추가 (선택사항)
+            float angleOffset = (count > 1) ? Mathf.Lerp(-15f, 15f, i / (float)(count - 1)) : 0f;
+            Vector2 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
+
+            var projObj = GameManager.Instance.Pool.GetBullet(prefabId);
+            projObj.transform.position = (Vector2)player.position + dir.normalized * 0.5f;
+            projObj.transform.rotation = Quaternion.identity;
+
+            var projCol = projObj.GetComponent<Collider2D>();
+            var playerCol = player.GetComponent<Collider2D>();
+            if (projCol != null && playerCol != null)
+                Physics2D.IgnoreCollision(projCol, playerCol, true);
+
+            var sp = projObj.GetComponent<ScissorProjectile>();
+            if (sp != null)
+            {
+                sp.speed = scissorSpeed;
+                sp.collisionDamage = scissorDirectDamage;
+                sp.maxLife = scissorMaxLife;
+                sp.dotDamage = scissorTrailDotDamage;
+                sp.dotInterval = scissorDotInterval;
+                sp.Init(dir);
+            }
+            projObj.SetActive(true);
+        }
+    }
 }

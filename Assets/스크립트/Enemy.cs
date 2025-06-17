@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour
     private bool isLive;
     private bool isSlowed;
     private bool isBurning;
+    private bool isPoisoned;
     private Coroutine slowRoutine;
 
     void Awake()
@@ -190,4 +191,39 @@ public class Enemy : MonoBehaviour
             if (spriters[i] != null)
                 spriters[i].color = originalColors[i];
     }
+
+    public void ApplyPoison(float tickDamage, float duration, float tickInterval)
+    {
+        if (!isLive || isPoisoned) return;
+
+        StartCoroutine(PoisonEffect(tickDamage, duration, tickInterval));
+    }
+
+    IEnumerator PoisonEffect(float tickDamage, float duration, float tickInterval)
+    {
+        isPoisoned = true;
+        float elapsed = 0f;
+
+        if (!isBurning && !isSlowed)
+            SetColor(Color.green);  // 독 색상
+
+        while (elapsed < duration)
+        {
+            TakeDamage(tickDamage);
+            elapsed += tickInterval;
+            yield return new WaitForSeconds(tickInterval);
+        }
+
+        isPoisoned = false;
+
+        // 색상 초기화 혹은 다른 상태이상에 따라 재설정
+        if (isBurning)
+            SetColor(Color.red);
+        else if (isSlowed)
+            SetColor(Color.blue);
+        else
+            ResetColor();
+    }
+
+
 }

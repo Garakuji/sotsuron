@@ -5,41 +5,66 @@ using UnityEngine;
 public class WeaponSelectorUI : MonoBehaviour
 {
     public WeaponSlotUI[] slotUIs;
+    private bool isChoosing = false;
 
     void Start()
     {
         Hide();
     }
 
-    public void Show(List<WeaponData> choices)
+    public void Show(List<WeaponData> allWeaponPool)
     {
-        // 1) 이미 maxLevel에 도달한 무기는 제외
-        var available = choices
+        const int maxChoices = 3;
+        List<WeaponData> finalChoices = new();
+
+        // 1. 만렙이 아닌 무기 후보
+        List<WeaponData> underMaxWeapons = allWeaponPool
             .Where(data =>
             {
                 var w = WeaponManager.Instance.GetWeaponById(data.id);
-                // 새로 얻는 경우(w==null)거나, 아직 maxLevel 아래인 경우만 남김
                 return w == null || w.level < Weapon.maxLevel;
             })
+            .OrderBy(_ => Random.value)
             .ToList();
 
-        // 2) 필터 후 남은 게 없으면 그냥 UI 닫기
-        if (available.Count == 0)
+        // 2. 만렙 무기 후보
+        List<WeaponData> maxedWeapons = allWeaponPool
+            .Where(data =>
+            {
+                var w = WeaponManager.Instance.GetWeaponById(data.id);
+                return w != null && w.level >= Weapon.maxLevel;
+            })
+            .OrderBy(_ => Random.value)
+            .ToList();
+
+        // 3. 우선 만렙 아닌 무기에서 채우기
+        finalChoices.AddRange(underMaxWeapons.Take(maxChoices));
+
+        // 4. 부족하면 만렙 무기 중 랜덤 추가
+        if (finalChoices.Count < maxChoices)
+        {
+            int need = maxChoices - finalChoices.Count;
+            finalChoices.AddRange(maxedWeapons.Take(need));
+        }
+
+        // 5. 선택지 없으면 닫기
+        if (finalChoices.Count == 0)
         {
             Hide();
             return;
         }
 
-        // 3) 화면에 표시
+        // 6. 표시
+        isChoosing = true;
         gameObject.SetActive(true);
         Time.timeScale = 0f;
 
         for (int i = 0; i < slotUIs.Length; i++)
         {
-            if (i < available.Count)
+            if (i < finalChoices.Count)
             {
                 slotUIs[i].gameObject.SetActive(true);
-                slotUIs[i].Set(available[i]);
+                slotUIs[i].Set(finalChoices[i]);
             }
             else
             {
@@ -48,17 +73,19 @@ public class WeaponSelectorUI : MonoBehaviour
         }
     }
 
+    public void OnWeaponSelected(WeaponData data)
+    {
+        if (!isChoosing) return;
+        isChoosing = false;
+
+        Hide();
+        WeaponManager.Instance.AddOrLevelupWeapon(data);
+    }
+
     public void Hide()
     {
         gameObject.SetActive(false);
         Time.timeScale = 1f;
     }
 
-    public void OnWeaponSelected(WeaponData data)
-    {
-        if (data == null) return;
-
-        Hide();
-        WeaponManager.Instance.AddOrLevelupWeapon(data);
-    }
 }
