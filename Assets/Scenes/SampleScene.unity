@@ -733,7 +733,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 4.090909
+  orthographic size: 2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1047,6 +1047,7 @@ MonoBehaviour:
   - {fileID: 1129350835168059271, guid: 3b4f6ca34f04d524fa86db98b3e0e4e7, type: 3}
   - {fileID: 7050773143698698582, guid: 63355f1afd284e742b462a74eb4e8c82, type: 3}
   - {fileID: 7953370068822084692, guid: f5cf487ea0b52b4459a977783c9bde94, type: 3}
+  - {fileID: 1944243728723036522, guid: b30f4d6f8a8e6e14cb95d96d1ead7f51, type: 3}
   expPrefabs:
   - {fileID: 3652740744769963717, guid: b9fffe13713542c44aee71a3c29c8c56, type: 3}
 --- !u!1 &619394800
@@ -1640,6 +1641,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eca7a1847d081144c9ad12a69aa1f5c7, type: 2}
   - {fileID: 11400000, guid: ab5ab56ab8d95e94480a3eb470372aff, type: 2}
   - {fileID: 11400000, guid: 99ba94eb316a58a449c5aabc2f5d13ba, type: 2}
+  - {fileID: 11400000, guid: de6481bec657b2043b642e0dfece5fc3, type: 2}
 --- !u!4 &960619468
 Transform:
   m_ObjectHideFlags: 0
@@ -1863,7 +1865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allWeaponDatas:
-  - {fileID: 11400000, guid: 99ba94eb316a58a449c5aabc2f5d13ba, type: 2}
+  - {fileID: 11400000, guid: de6481bec657b2043b642e0dfece5fc3, type: 2}
 --- !u!4 &1052019191
 Transform:
   m_ObjectHideFlags: 0

@@ -55,6 +55,22 @@ public class Weapon : MonoBehaviour
     public float fieldPullForce = 10f;
     public float fieldRadius = 2f;
 
+    [Header("Shockwave Hammer Stats")]
+    public float hammerMaxRadius   = 2f;
+    public float hammerExpandTime  = 0.3f;
+    public float hammerKnockback   = 8f;
+    public int   hammerDamage      = 2;
+
+    [Header("Shockwave Hammer Leveling")]
+    public float hammerBaseRadius        = 3f;
+    public float hammerRadiusPerLevel    = 0.5f;
+    public float hammerBaseExpandTime    = 0.2f;
+    public float hammerExpandTimePerLevel = 0.01f;
+    public float hammerBaseKnockback     = 8f;
+    public float hammerKnockbackPerLevel = 1f;
+    public int   hammerBaseDamage        = 2;
+    public int   hammerDamagePerLevel    = 1;
+
     private Vector3 _originalScale;
 
     void Awake()
@@ -85,74 +101,74 @@ public class Weapon : MonoBehaviour
 
     void Update()
     {
-            if (player == null) return;
+        if (player == null) return;
 
-            switch (id)
-            {
-                case 0:
-                    Vector3 pivot = player.position + Vector3.up * pivotYOffset;
-                    transform.position = pivot;
-                    transform.localScale = _originalScale;
-                    foreach (Transform blade in transform)
-                    {
-                        blade.RotateAround(pivot, Vector3.forward, speed * Time.deltaTime);
-                        blade.localScale = _bladeOriginalScale;
-                    }
-                    break;
+        switch (id)
+        {
+            case 0:
+                Vector3 pivot = player.position + Vector3.up * pivotYOffset;
+                transform.position = pivot;
+                transform.localScale = _originalScale;
+                foreach (Transform blade in transform)
+                {
+                    blade.RotateAround(pivot, Vector3.forward, speed * Time.deltaTime);
+                    blade.localScale = _bladeOriginalScale;
+                }
+                break;
 
-                case 1:
-                    FollowPlayer();
-                    if ((timer += Time.deltaTime) > speed)
-                    {
-                        timer = 0f;
-                        FireTrackingArrows();
-                    }
-                    break;
+            case 1:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireTrackingArrows();
+                }
+                break;
 
-                case 2:
-                    FollowPlayer();
-                    if ((timer += Time.deltaTime) > speed)
-                    {
-                        timer = 0f;
-                        FireLightningBolts();
-                    }
-                    break;
+            case 2:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireLightningBolts();
+                }
+                break;
 
-                case 3:
-                    FollowPlayer();
-                    if ((timer += Time.deltaTime) > speed)
-                    {
-                        timer = 0f;
-                        FireFireball();
-                    }
-                    break;
+            case 3:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireFireball();
+                }
+                break;
 
-                case 4:
-                    FollowPlayer();
-                    if ((waterTimer += Time.deltaTime) > speed)
-                    {
-                        waterTimer = 0f;
-                        SpawnWaterZone();
-                    }
-                    break;
+            case 4:
+                FollowPlayer();
+                if ((waterTimer += Time.deltaTime) > speed)
+                {
+                    waterTimer = 0f;
+                    SpawnWaterZone();
+                }
+                break;
 
-                case 5:
-                    FollowPlayer();
-                    if ((timer += Time.deltaTime) > speed)
-                    {
-                        timer = 0f;
-                        FireToxicThorns();
-                    }
-                    break;
+            case 5:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireToxicThorns();
+                }
+                break;
 
-                case 6:
-                    FollowPlayer();
-                    if ((timer += Time.deltaTime) > speed)
-                    {
-                        timer = 0f;
-                        FireScythe();
-                    }
-                    break;
+            case 6:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireScythe();
+                }
+                break;
 
             case 7: // Thread Trap
                 FollowPlayer();
@@ -179,7 +195,14 @@ public class Weapon : MonoBehaviour
                     FireAttractionField();
                 }
                 break;
-
+            case 10:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireShockwaveHammer();
+                }
+                break;
             default:
                 FollowPlayer();
                 break;
@@ -275,6 +298,20 @@ public class Weapon : MonoBehaviour
                 fieldRadius = 0.5f + 0.2f * (level - 1);
                 speed = Mathf.Max(3f - 0.1f * (level - 1), 1f);
                 break;
+
+            case 10: // Shockwave Hammer 레벨업 처리
+                // 반경 증가
+                hammerMaxRadius = hammerBaseRadius + hammerRadiusPerLevel * (level - 1);
+                // 확산 시간 (짧을수록 빠름)
+                hammerExpandTime = Mathf.Max(hammerBaseExpandTime + hammerExpandTimePerLevel * (level - 1),0.05f);
+                // 넉백 세기 증가
+                hammerKnockback = hammerBaseKnockback + hammerKnockbackPerLevel * (level - 1);
+                // 데미지 증가
+                hammerDamage = hammerBaseDamage + hammerDamagePerLevel * (level - 1);
+                // 쿨다운 5%씩 감소, 최소 0.2초
+                speed = 2f;
+                break;
+
         }
     }
 
@@ -504,8 +541,8 @@ public class Weapon : MonoBehaviour
 
             // 방향에 따라 스프라이트 회전 설정
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            projObj.transform.rotation = Quaternion.Euler(0f, 0f, angle-45f);
-            
+            projObj.transform.rotation = Quaternion.Euler(0f, 0f, angle - 45f);
+
             var projCol = projObj.GetComponent<Collider2D>();
             var playerCol = player.GetComponent<Collider2D>();
             if (projCol != null && playerCol != null)
@@ -539,7 +576,7 @@ public class Weapon : MonoBehaviour
 
         // 프리팹 회전: 기본 오른쪽(Vector2.right) → dir
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        spearObj.transform.rotation = Quaternion.AngleAxis(angle-45f, Vector3.forward);
+        spearObj.transform.rotation = Quaternion.AngleAxis(angle - 45f, Vector3.forward);
 
         // 컴포넌트 초기화
         var spear = spearObj.GetComponent<PiercingSpear>();
@@ -575,5 +612,25 @@ public class Weapon : MonoBehaviour
 
         fieldObj.SetActive(true);
     }
+// Weapon.cs: FireShockwaveHammer() 호출부에서 너프된 파라미터 설정
+private void FireShockwaveHammer()
+{
+    var obj = GameManager.Instance.Pool.GetBullet(prefabId);
+    obj.SetActive(true);
+
+    var hammer = obj.GetComponent<ShockwaveHammer>();
+    if (hammer != null)
+    {
+        // 너프된 파라미터
+        hammer.maxRadius      = 1.5f;
+        hammer.expandTime     = 0.6f;  // 총 확산 시간의 반을 내부에서 0.3초로 사용
+        hammer.knockbackForce = 7f;
+        hammer.damage         = hammerDamage;
+
+        // 플레이어를 계속 따라다니며 실행
+        hammer.FireFollow(player);
+    }
+}
+
 
 }

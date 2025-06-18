@@ -40,41 +40,40 @@ public class AttractionField : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    void FixedUpdate()
+void FixedUpdate()
+{
+    // 레이어 마스크 없이 모든 콜라이더 검색
+    Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+
+    foreach (var hit in hits)
     {
-        // 1) 모든 Enemy.isPulled 초기화
-        foreach (var e in FindObjectsOfType<Enemy>())
-            e.isPulled = false;
+        // 태그가 Enemy인 것만 끌기
+        if (!hit.CompareTag("Enemy"))
+            continue;
 
-        // 2) 범위 내 콜라이더 검색
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, targetLayer);
-        Debug.Log($"[AttractionField] hits count: {hits.Length}");
+        var enemy = hit.GetComponent<Enemy>();
+        if (enemy == null) continue;
 
-        foreach (var hit in hits)
+        enemy.isPulled = true;
+        Debug.Log($"[AttractionField] pulling: {enemy.name}");
+
+        // 끌어당김 로직...
+        var rb = hit.attachedRigidbody;
+        if (rb != null)
         {
-            var enemy = hit.GetComponent<Enemy>();
-            if (enemy == null) continue;
-
-            // 3) 끌림 상태 설정
-            enemy.isPulled = true;
-            Debug.Log($"[AttractionField] pulling: {enemy.name}");
-
-            // 4) 실제 끌어당김
-            var rb = hit.attachedRigidbody;
-            if (rb != null)
-            {
-                Vector2 dir = ((Vector2)transform.position - rb.position).normalized;
-                Vector2 newPos = rb.position + dir * pullSpeed * Time.fixedDeltaTime;
-                rb.MovePosition(newPos);
-            }
-            else
-            {
-                Transform t = hit.transform;
-                Vector2 dir = ((Vector2)transform.position - (Vector2)t.position).normalized;
-                t.position = Vector2.MoveTowards(t.position, transform.position, pullSpeed * Time.fixedDeltaTime);
-            }
+            Vector2 dir = ((Vector2)transform.position - rb.position).normalized;
+            Vector2 newPos = rb.position + dir * pullSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(newPos);
+        }
+        else
+        {
+            Transform t = hit.transform;
+            Vector2 dir = ((Vector2)transform.position - (Vector2)t.position).normalized;
+            t.position = Vector2.MoveTowards(t.position, transform.position, pullSpeed * Time.fixedDeltaTime);
         }
     }
+}
+
 
     public void Init(float duration, float pullSpeed, float radius)
     {

@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1203758647696985314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 952663350847995795}
+  - component: {fileID: 2140286012526912001}
+  m_Layer: 0
+  m_Name: Weapon 10
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &952663350847995795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203758647696985314}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.1614505, y: -0.9221387, z: 2.3004518}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2140286012526912001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203758647696985314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e29c8567db7e77f48911cd035b0b90d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 10
+  prefabId: 10
+  level: 1
+  damage: 0
+  count: 0
+  speed: 0
+  bladePrefab: {fileID: 0}
+  bladeDistance: 1.5
+  pivotYOffset: 0.3
+  player: {fileID: 0}
+  waterVFXPrefab: {fileID: 0}
+  scissorSpeed: 5
+  scissorMaxLife: 3
+  scissorDirectDamage: 1
+  scissorTrailDotDamage: 1
+  scissorDotInterval: 0.5
+  scissorTrailRadius: 0.3
+  spearProjectileSpeed: 12
+  spearProjectileDistance: 5
+  fieldDuration: 3
+  fieldPullForce: 10
+  fieldRadius: 2
+  hammerMaxRadius: 3
+  hammerExpandTime: 0.2
+  hammerKnockback: 8
+  hammerDamage: 2
+  hammerBaseRadius: 3
+  hammerRadiusPerLevel: 0.5
+  hammerBaseExpandTime: 0.2
+  hammerExpandTimePerLevel: -0.02
+  hammerBaseKnockback: 8
+  hammerKnockbackPerLevel: 1
+  hammerBaseDamage: 2
+  hammerDamagePerLevel: 1
