@@ -62,13 +62,13 @@ public class Weapon : MonoBehaviour
     public int   hammerDamage      = 2;
 
     [Header("Shockwave Hammer Leveling")]
-    public float hammerBaseRadius        = 3f;
+    public float hammerBaseRadius        = 4f;
     public float hammerRadiusPerLevel    = 0.5f;
     public float hammerBaseExpandTime    = 0.2f;
     public float hammerExpandTimePerLevel = 0.01f;
     public float hammerBaseKnockback     = 8f;
     public float hammerKnockbackPerLevel = 1f;
-    public int   hammerBaseDamage        = 2;
+    public int   hammerBaseDamage        = 3;
     public int   hammerDamagePerLevel    = 1;
 
     private Vector3 _originalScale;
@@ -622,9 +622,9 @@ private void FireShockwaveHammer()
     if (hammer != null)
     {
         // 너프된 파라미터
-        hammer.maxRadius      = 1.5f;
+        hammer.maxRadius      = 2.5f;
         hammer.expandTime     = 0.6f;  // 총 확산 시간의 반을 내부에서 0.3초로 사용
-        hammer.knockbackForce = 7f;
+        hammer.knockbackForce = 9f;
         hammer.damage         = hammerDamage;
 
         // 플레이어를 계속 따라다니며 실행

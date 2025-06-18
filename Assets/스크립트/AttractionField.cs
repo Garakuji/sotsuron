@@ -55,7 +55,7 @@ void FixedUpdate()
         if (enemy == null) continue;
 
         enemy.isPulled = true;
-        Debug.Log($"[AttractionField] pulling: {enemy.name}");
+
 
         // 끌어당김 로직...
         var rb = hit.attachedRigidbody;

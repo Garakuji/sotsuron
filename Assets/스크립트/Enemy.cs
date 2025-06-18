@@ -78,12 +78,12 @@ public class Enemy : MonoBehaviour
     {
         if (isKnockedBack)
         {
-            Debug.Log($"[Enemy] {name} skipping move: knocked back");
+
             return;
         }
         if (isPulled)
         {
-            Debug.Log($"[Enemy] {name} skipping move: isPulled");
+
             return;
         }
 
@@ -111,14 +111,19 @@ public class Enemy : MonoBehaviour
     {
         if (!isLive) return;
 
+        // 1. 체력 감소 및 피격 플래시
         health -= dmg;
         StartCoroutine(HitFlash());
 
-        // 넉백 코루틴 호출
-        StartCoroutine(Knockback(sourcePosition));
-
+        // 2. 체력이 0 이하라면 즉시 Die() 호출하고 넉백은 실행하지 않음
         if (health <= 0f)
+        {
             Die();
+            return;
+        }
+
+        // 3. 살아있으면 넉백 처리
+        StartCoroutine(Knockback(sourcePosition));
     }
 
     IEnumerator HitFlash()

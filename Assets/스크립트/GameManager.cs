@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     // 더 이상 배열이 아니라, 함수로 계산합니다.
     [Header("# Level-Up Curve")]
     [Tooltip("레벨업에 필요한 기본 경험치")]
-    public float expBase = 3f;
+    public float expBase = 2f;
     [Tooltip("레벨업 필요 경험치 증가 비율 (>1)")]
     public float expGrowthRate = 1.2f;
 

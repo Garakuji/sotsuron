@@ -733,7 +733,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 2
+  orthographic size: 4.090909
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1625,7 +1625,7 @@ MonoBehaviour:
   level: 0
   kill: 0
   exp: 0
-  expBase: 10
+  expBase: 3
   expGrowthRate: 1.2
   player: {fileID: 1625504797}
   Pool: {fileID: 593586848}
