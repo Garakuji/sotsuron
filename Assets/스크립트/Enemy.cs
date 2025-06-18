@@ -19,7 +19,10 @@ public class Enemy : MonoBehaviour
     private bool isBurning;
     private bool isPoisoned;
     private Coroutine slowRoutine;
-
+    private bool isKnockedBack = false;
+    [HideInInspector] public bool isPulled = false;
+    public float knockbackForce = 5f;
+    public float knockbackDuration = 0.2f;
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -33,23 +36,28 @@ public class Enemy : MonoBehaviour
 
     void OnEnable()
     {
+        // ── 여기서 모든 상태 이상 플래그 초기화 ──
+        isPulled = false;
+        isKnockedBack = false;
+        isSlowed = false;
+        isBurning = false;
+        isPoisoned = false;
+
+        // (기존 초기화들)
         isLive = true;
         speed = baseSpeed;
         health = maxHealth;
         gameObject.tag = "Enemy";
         anim.SetBool("isDeath", false);
         GetComponent<Collider2D>().enabled = true;
+        // 스프라이트 색·활성화 초기화…
         for (int i = 0; i < spriters.Length; i++)
         {
-            if (spriters[i] != null)
-            {
-                spriters[i].enabled = true; // ✅ 반드시 초기화
-                spriters[i].color = originalColors[i]; // ✅ 색상도 초기화
-            }
+            spriters[i].enabled = true;
+            spriters[i].color = originalColors[i];
         }
         StartCoroutine(AssignTarget());
     }
-
     IEnumerator AssignTarget()
     {
         while (GameManager.Instance?.player == null)
@@ -68,12 +76,21 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isKnockedBack)
+        {
+            Debug.Log($"[Enemy] {name} skipping move: knocked back");
+            return;
+        }
+        if (isPulled)
+        {
+            Debug.Log($"[Enemy] {name} skipping move: isPulled");
+            return;
+        }
+
         if (!isLive || target == null) return;
 
         Vector2 dir = target.position - rigid.position;
         rigid.MovePosition(rigid.position + dir.normalized * speed * Time.fixedDeltaTime);
-        rigid.linearVelocity = Vector2.zero;
-
         anim.SetBool("1_Move", dir.magnitude > 0.01f);
     }
 
@@ -85,20 +102,26 @@ public class Enemy : MonoBehaviour
         scale.x = target.position.x < rigid.position.x ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
         transform.localScale = scale;
     }
-
     public void TakeDamage(float dmg)
+    {
+        // 넉백 원점을 enemy 자기 위치로 넘겨줌
+        TakeDamage(dmg, transform.position);
+    }
+    public void TakeDamage(float dmg, Vector2 sourcePosition)
     {
         if (!isLive) return;
 
         health -= dmg;
+        StartCoroutine(HitFlash());
 
-        if (health > 0)
-            StartCoroutine(HitFlash());
-        else
+        // 넉백 코루틴 호출
+        StartCoroutine(Knockback(sourcePosition));
+
+        if (health <= 0f)
             Die();
     }
 
- IEnumerator HitFlash()
+    IEnumerator HitFlash()
 {
     for (int i = 0; i < 2; i++)
     {
@@ -224,6 +247,19 @@ public class Enemy : MonoBehaviour
         else
             ResetColor();
     }
+    private IEnumerator Knockback(Vector2 sourcePos)
+    {
+        isKnockedBack = true;
 
+        // 넉백 방향: (Enemy 위치 − 데미지 원점 위치)
+        Vector2 kbDir = ((Vector2)transform.position - sourcePos).normalized;
+        rigid.AddForce(kbDir * knockbackForce, ForceMode2D.Impulse);
+
+        yield return new WaitForSeconds(knockbackDuration);
+
+        // 넉백 후 관성을 없애고 상태 복원
+        rigid.linearVelocity = Vector2.zero;
+        isKnockedBack = false;
+    }
 
 }

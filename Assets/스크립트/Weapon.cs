@@ -45,6 +45,16 @@ public class Weapon : MonoBehaviour
     public float scissorTrailRadius = 0.3f;
     // trailDuration 대신 scissorMaxLife 사용
 
+    [Header("Piercing Spear Stats")]
+    public float spearProjectileSpeed = 12f;
+    public float spearProjectileDistance = 5f;
+
+
+    [Header("Attraction Field Stats")]
+    public float fieldDuration = 3f;
+    public float fieldPullForce = 10f;
+    public float fieldRadius = 2f;
+
     private Vector3 _originalScale;
 
     void Awake()
@@ -153,6 +163,22 @@ public class Weapon : MonoBehaviour
                     FireScissor();
                 }
                 break;
+            case 8:
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FirePiercingSpear();
+                }
+                break;
+            case 9: // 예: 9번을 Attraction Field ID로
+                FollowPlayer();
+                if ((timer += Time.deltaTime) > speed)
+                {
+                    timer = 0f;
+                    FireAttractionField();
+                }
+                break;
 
             default:
                 FollowPlayer();
@@ -187,15 +213,15 @@ public class Weapon : MonoBehaviour
                 break;
 
             case 1:
-                damage = 10f + 3f * (level - 1);
-                count = 1 + ((level >= 2) ? 1 : 0) + ((level >= 3) ? 1 : 0) + ((level >= 4) ? 1 : 0);
+                damage = 6f + 3f * (level - 1);
+                count = 1 + ((level >= 2) ? 1 : 0) + ((level >= 3) ? 1 : 0);
                 speed = 0.5f;
                 break;
 
             case 2:
                 damage = 8f + 1f * (level - 1);
                 count = 3;
-                speed = 1.2f - 0.02f * (level - 1);
+                speed = 1.2f - 0.05f * (level - 1);
                 break;
 
             case 3:
@@ -214,7 +240,7 @@ public class Weapon : MonoBehaviour
 
             case 5:
                 damage = 6f + 2f * (level - 1);
-                burnTickDamage = damage * 0.3f + level;
+                burnTickDamage = damage * 0.3f + level; //posion
                 zoneDuration = 3f + 0.3f * (level - 1);
                 speed = Mathf.Max(3.0f - 0.2f * (level - 1), 0.5f);
                 break;
@@ -232,7 +258,22 @@ public class Weapon : MonoBehaviour
                 speed = scissorSpeed = 5f + 2f * (level - 1);
                 scissorDotInterval = Mathf.Max(0.5f - 0.05f * (level - 1), 0.2f);
                 // 레벨 증가에 따른 최대 발사 개수 제한: 최대 4
-                count = Mathf.Min(level, 4);
+                count = Mathf.Min(level, 2);
+                break;
+
+            case 8:  // Piercing Spear
+                damage = 10f + 3f * (level - 1);
+                spearProjectileSpeed = 12f + 1f * (level - 1);
+                spearProjectileDistance = 5f + 0.5f * (level - 1);
+                speed = Mathf.Max(2.0f - 0.1f * (level - 1), 0.3f); // 발사 쿨다운
+                break;
+
+            case 9: // Attraction Field
+                // 레벨에 따라 파라미터 조정
+                fieldDuration = 2f + 0.5f * (level - 1);
+                fieldPullForce = 8f + 2f * (level - 1);
+                fieldRadius = 0.5f + 0.2f * (level - 1);
+                speed = Mathf.Max(3f - 0.1f * (level - 1), 1f);
                 break;
         }
     }
@@ -460,8 +501,11 @@ public class Weapon : MonoBehaviour
 
             var projObj = GameManager.Instance.Pool.GetBullet(prefabId);
             projObj.transform.position = (Vector2)player.position + dir.normalized * 0.5f;
-            projObj.transform.rotation = Quaternion.identity;
 
+            // 방향에 따라 스프라이트 회전 설정
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            projObj.transform.rotation = Quaternion.Euler(0f, 0f, angle-45f);
+            
             var projCol = projObj.GetComponent<Collider2D>();
             var playerCol = player.GetComponent<Collider2D>();
             if (projCol != null && playerCol != null)
@@ -477,7 +521,59 @@ public class Weapon : MonoBehaviour
                 sp.dotInterval = scissorDotInterval;
                 sp.Init(dir);
             }
+
             projObj.SetActive(true);
         }
     }
+    // ===== Weapon.cs 내 FirePiercingSpear() 수정 =====
+    private void FirePiercingSpear()
+    {
+        // 풀에서 프리팹 꺼내기
+        var spearObj = GameManager.Instance.Pool.GetBullet(prefabId);
+        spearObj.transform.position = transform.position;
+
+        // 발사 방향 계산 (플레이어의 마지막 이동 방향)
+        Vector2 dir = player.GetComponent<move_test>().lastMoveDir;
+        if (dir == Vector2.zero) dir = Vector2.right;
+        dir.Normalize();
+
+        // 프리팹 회전: 기본 오른쪽(Vector2.right) → dir
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        spearObj.transform.rotation = Quaternion.AngleAxis(angle-45f, Vector3.forward);
+
+        // 컴포넌트 초기화
+        var spear = spearObj.GetComponent<PiercingSpear>();
+        if (spear != null)
+        {
+            spear.damage = Mathf.RoundToInt(damage);
+            spear.speed = spearProjectileSpeed;
+            spear.maxDistance = spearProjectileDistance;
+            spear.direction = dir;           // 새 방향 지정
+            spear.ResetState();
+        }
+
+        spearObj.SetActive(true);
+    }
+    private void FireAttractionField()
+    {
+        // 풀에서 필드 프리팹 가져오기
+        var fieldObj = GameManager.Instance.Pool.GetBullet(prefabId);
+
+        // 플레이어 주변 랜덤 위치 계산
+        float spawnRadius = fieldRadius; // 원 안에 스폰하고 싶다면 fieldRadius 사용
+        Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
+        Vector2 spawnPos = (Vector2)player.position + randomOffset;
+
+        fieldObj.transform.position = spawnPos;
+
+        // 컴포넌트 초기화
+        var field = fieldObj.GetComponent<AttractionField>();
+        if (field != null)
+        {
+            field.Init(fieldDuration, fieldPullForce, fieldRadius);
+        }
+
+        fieldObj.SetActive(true);
+    }
+
 }

@@ -46,7 +46,7 @@ public class Spawner : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        level = Mathf.FloorToInt(GameManager.Instance.GameTime / 10f);
+        level = Mathf.FloorToInt(GameManager.Instance.GameTime / 20f);
 
         // 스폰 간격을 선형 보간으로 서서히 감소시킴
         float t = Mathf.Clamp01(level / intervalRampLevel);
@@ -61,14 +61,14 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
-        // PoolManager에 등록된 몬스터 프리팹 개수에 맞춰 타입 결정
-        int maxType = pool.monsterPrefabs.Length - 1;
-        int type = Mathf.Clamp(level, 0, maxType);
+        // PoolManager에 등록된 몬스터 프리팹 개수에 맞춰 무작위 타입 결정
+        int prefabCount = pool.monsterPrefabs.Length;      // 2종이면 prefabCount == 2
+        int type = Random.Range(0, prefabCount);           // [0, prefabCount) 범위의 정수, 즉 0 또는 1
 
         // 풀에서 몬스터 꺼내오기
         GameObject enemyGO = pool.GetMonster(type);
 
-        // 랜덤 스폰 포인트 (인덱스 0은 자기 자신 Transform)
+        // 랜덤 스폰 포인트
         int idx = Random.Range(1, spawnPoints.Length);
         enemyGO.transform.position = spawnPoints[idx].position;
 
@@ -76,12 +76,13 @@ public class Spawner : MonoBehaviour
         Enemy enemyLogic = enemyGO.GetComponent<Enemy>();
         SpawnData data = new SpawnData();
 
-        // — 체력(기존 로직 그대로) —
+        // 체력
         int baseHealth = 5;
         int healthGrow = 2;
+        int level = Mathf.FloorToInt(GameManager.Instance.GameTime / 20f);
         data.health = baseHealth + level * healthGrow;
 
-        // — 속도: 플레이어 속도 × 비율(레벨마다 소폭 증가) —
+        // 속도
         int speedTiers = level / 10;
         float speedRatio = baseSpeedRatio + speedRatioIncrement * speedTiers;
         data.speed = playerController.speed * speedRatio;
@@ -92,7 +93,8 @@ public class Spawner : MonoBehaviour
     }
 }
 
-[System.Serializable]
+
+    [System.Serializable]
 public class SpawnData
 {
     public float spawnTime;
