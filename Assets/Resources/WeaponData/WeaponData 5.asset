@@ -15,5 +15,6 @@ MonoBehaviour:
   id: 5
   prefabId: 5
   icon: {fileID: 21300000, guid: 06cf77d19ac056948a969dd7837cb7af, type: 3}
-  description: dsf
+  description: "Launches poisoned spikes for instant damage and DoT;\n levels add
+    more thorns and strengthen poison."
   prefab: {fileID: 7048844332172291362, guid: cc2b154cbb78c8f409a34ffd8fe6be3d, type: 3}

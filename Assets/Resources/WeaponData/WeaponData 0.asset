@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 0
   prefabId: 0
   icon: {fileID: 21300000, guid: 02de1ff20dcb25e4eb10fd08f3f52393, type: 3}
-  description: asdf
+  description: 'Rotates around you, damaging enemies on contact;
+
+    levels add
+    more chakrams and boost damage.'
   prefab: {fileID: 4168084179589891358, guid: 692e340f4309a05449ffda350b3d5e45, type: 3}

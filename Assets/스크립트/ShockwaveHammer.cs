@@ -38,23 +38,19 @@ public class ShockwaveHammer : MonoBehaviour
 
     private IEnumerator RunFollow(Transform player)
     {
-        // 절반으로 너프
         float halfExpand = expandTime * 0.5f;
-        float halfVfx     = _vfxDuration  * 0.5f;
+        float halfVfx = _vfxDuration * 0.5f;
 
-        // 이펙트 재생
         _ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         _ps.Play(true);
 
         float elapsed = 0f;
-        _col.enabled = true;
 
-        // 1) 반 타임 확산
+        // 1) 확산 구간—콜라이더 켜기
+        _col.enabled = true;
         while (elapsed < halfExpand)
         {
-            // 항상 플레이어 위치 동기화
             transform.position = player.position;
-
             float t = elapsed / halfExpand;
             float r = Mathf.Lerp(0f, maxRadius, t);
             _col.radius = r;
@@ -64,24 +60,26 @@ public class ShockwaveHammer : MonoBehaviour
             yield return null;
         }
 
-        // 2) 반 타임 유지
+        // **여기서 콜라이더 끄기** (유지 구간에는 피해가 들어가지 않도록)
+        _col.enabled = false;
+
+        // 2) VFX만 유지 (원하는 만큼)
         float keepTime = halfVfx - halfExpand;
-        float timer    = 0f;
+        float timer = 0f;
         while (timer < keepTime)
         {
             transform.position = player.position;
-            _col.radius = maxRadius;
+            // 콜라이더는 꺼져 있으니 피해 판정 없음
             transform.localScale = Vector3.one;
-
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // 3) 정리
-        _col.enabled = false;
+        // 3) 마무리
         transform.localScale = Vector3.one * 0.01f;
         _isRunning = false;
     }
+
 
     void OnTriggerEnter2D(Collider2D other)
     {

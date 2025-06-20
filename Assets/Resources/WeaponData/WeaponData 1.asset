@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 1
   prefabId: 1
   icon: {fileID: 21300000, guid: b8ad44a6279afd847af6cf09bad38fe6, type: 3}
-  description: asdf
+  description: 'Auto-targets the nearest foe and fires arrows;
+
+    levels increase
+    shot count and fire rate.'
   prefab: {fileID: 7974903455733748962, guid: b9cff3c4e3d41fa488ced8d774ce62bb, type: 3}

@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 10
   prefabId: 10
   icon: {fileID: 21300000, guid: 91b0d31b0621aab4ea0e0c4b83b1a638, type: 3}
-  description: asd
+  description: 'Slams down a shockwave to knock back and damage enemies;
+
+    levels
+    raise damage, attack speed, radius, and knockback strength.'
   prefab: {fileID: 1203758647696985314, guid: c81b10a62f36bd343bbe0ea8000a48d3, type: 3}

@@ -9,46 +9,32 @@ public class Spawner : MonoBehaviour
     public Transform[] spawnPoints;
 
     [Header("몬스터 스폰 주기 커스터마이즈")]
-    [Tooltip("Level 0일 때 간격")]
     public float startInterval = 0.5f;
-    [Tooltip("몇 레벨에 걸쳐 서서히 줄어들지")]
     public float intervalRampLevel = 30f;
-    [Tooltip("최소 스폰 간격")]
     public float endInterval = 0.2f;
 
     [Header("몬스터 속도 비율 (플레이어 속도 대비)")]
-    [Tooltip("기본 비율: 몬스터 속도 = player.speed × baseSpeedRatio")]
     public float baseSpeedRatio = 0.5f;
-    [Tooltip("10레벨마다 이만큼 비율을 추가로 올림")]
     public float speedRatioIncrement = 0.05f;
 
     private float timer;
     private int level;
     private PoolManager pool;
-    private move_test playerController;
+     // monsterPrefabs[7] 에 보스 프리팹이 있다고 가정
 
-    void Awake()
+    void Start()
     {
-        // 자식으로 붙은 SpawnPoint들
         spawnPoints = GetComponentsInChildren<Transform>();
-
-        // PoolManager 싱글턴
         pool = PoolManager.Instance;
         if (pool == null)
             Debug.LogError("Spawner: PoolManager.Instance가 없습니다!");
-
-        // 플레이어 이동 속도 가져오기
-        playerController = GameManager.Instance.player.GetComponent<move_test>();
-        if (playerController == null)
-            Debug.LogError("Spawner: move_test 컴포넌트가 없습니다!");
     }
 
     void Update()
     {
         timer += Time.deltaTime;
-        level = Mathf.FloorToInt(GameManager.Instance.GameTime / 20f);
+        level = Mathf.FloorToInt(GameManager.Instance.GameTime / 15f);
 
-        // 스폰 간격을 선형 보간으로 서서히 감소시킴
         float t = Mathf.Clamp01(level / intervalRampLevel);
         float spawnInterval = Mathf.Lerp(startInterval, endInterval, t);
 
@@ -61,43 +47,66 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
-        // PoolManager에 등록된 몬스터 프리팹 개수에 맞춰 무작위 타입 결정
-        int prefabCount = pool.monsterPrefabs.Length;      // 2종이면 prefabCount == 2
-        int type = Random.Range(0, prefabCount);           // [0, prefabCount) 범위의 정수, 즉 0 또는 1
+        float elapsed = GameManager.Instance.GameTime;
 
-        // 풀에서 몬스터 꺼내오기
-        GameObject enemyGO = pool.GetMonster(type);
 
-        // 랜덤 스폰 포인트
+        // ───── 기존 일반 몬스터 스폰 로직 ─────
+        int baseHealth = 10;
+        int healthGrow = 8;
+        int type;
+
+        if (elapsed > 60f && Random.value < 0.1f)
+        {
+            type = 4;
+        }
+        else if (elapsed > 90f && Random.value < 0.1f)
+        {
+            type = 5;
+        }
+        else if (elapsed > 120f && Random.value < 0.1f)
+        {
+            type = 6;
+        }
+        else if (elapsed > 90f && Random.value < 0.05f)
+        {
+            type = 7;
+        }
+        else if (elapsed > 90f && Random.value < 0.05f)
+        {
+            type = 8;
+        }
+        else if (elapsed > 90f && Random.value < 0.05f)
+        {
+            type = 9;
+        }
+        else
+        {
+            var spawnable = new List<int>();
+            if (level < 2) spawnable.Add(0);
+            else if (level < 4) spawnable.AddRange(new[] { 0, 1 });
+            else spawnable.AddRange(new[] { 0, 1, 2, 3 });
+            type = spawnable[Random.Range(0, spawnable.Count)];
+        }
+
+        var enemyGO = pool.GetMonster(type);
         int idx = Random.Range(1, spawnPoints.Length);
         enemyGO.transform.position = spawnPoints[idx].position;
 
-        // 스탯 세팅
-        Enemy enemyLogic = enemyGO.GetComponent<Enemy>();
-        SpawnData data = new SpawnData();
-
-        // 체력
-        int baseHealth = 5;
-        int healthGrow = 2;
-        int level = Mathf.FloorToInt(GameManager.Instance.GameTime / 20f);
-        data.health = baseHealth + level * healthGrow;
-
-        // 속도
-        int speedTiers = level / 10;
-        float speedRatio = baseSpeedRatio + speedRatioIncrement * speedTiers;
-        data.speed = playerController.speed * speedRatio;
-
-        data.spawnTime = 0f;
-
-        enemyLogic.Init(data);
+        var data = new SpawnData
+        {
+            type = type,
+            health = baseHealth + level * healthGrow,
+            speed = 3f * (baseSpeedRatio + speedRatioIncrement * (level / 10f))
+        };
+        enemyGO.GetComponent<Enemy>().Init(data);
     }
 }
 
-
-    [System.Serializable]
+[System.Serializable]
 public class SpawnData
 {
     public float spawnTime;
-    public int health;
+    public int type;    // 0~3: 일반, 4: 엘리트, 5~6: 원거리, 7: 보스
+    public float health;
     public float speed;
 }

@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 4
   prefabId: 4
   icon: {fileID: 21300000, guid: b55fca73f3f555e4fb1ffefc912dcd14, type: 3}
-  description: asdf
+  description: 'Creates slowing, damaging puddles beneath enemies;
+
+    levels extend
+    duration and radius.'
   prefab: {fileID: 3814838431402942519, guid: b243e30cafe31344ea6ff9ceef6ae713, type: 3}

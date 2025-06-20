@@ -16,12 +16,14 @@ public class PoolManager : MonoBehaviour
     [Header("Exp Prefabs")]
     public GameObject[] expPrefabs;
 
-
+    [Header("enemy Projectile Prefabs")]      // ① 인스펙터용 배열 추가
+    public GameObject[] enemyBulletPrefabs;
 
     private List<GameObject>[] monsterPools;
     private List<GameObject>[] bulletPools;
+    private List<GameObject>[] enemyBulletPools;
     private List<GameObject>[] expPools;
-
+    
 
     private void Awake()
     {
@@ -42,6 +44,9 @@ public class PoolManager : MonoBehaviour
         for (int i = 0; i < expPrefabs.Length; i++)
             expPools[i] = new List<GameObject>();
 
+        enemyBulletPools = new List<GameObject>[enemyBulletPrefabs.Length];
+                for (int i = 0; i < enemyBulletPrefabs.Length; i++)
+            enemyBulletPools[i] = new List<GameObject>();
     }
 
     public GameObject GetMonster(int index)
@@ -112,5 +117,23 @@ public class PoolManager : MonoBehaviour
 
         return select;
     }
-
+    public GameObject GetEnemyBullet(int index)
+    {
+        GameObject select = null;
+        foreach (GameObject item in enemyBulletPools[index])
+        {
+            if (!item.activeSelf)
+            {
+                select = item;
+                select.SetActive(true);
+                break;
+            }
+        }
+        if (select == null)
+        {
+            select = Instantiate(enemyBulletPrefabs[index], transform);
+            enemyBulletPools[index].Add(select);
+        }
+        return select;
+    }
 }

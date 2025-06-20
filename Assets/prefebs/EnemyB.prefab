@@ -4592,8 +4592,17 @@ MonoBehaviour:
   speed: 0
   health: 0
   maxHealth: 0
-  knockbackForce: 5
+  isPulled: 0
+  knockbackForce: 3
   knockbackDuration: 0.2
+  projectilePrefab: {fileID: 0}
+  projectilePoolIndex: 0
+  attackCooldown: 2
+  projectileSpeed: 5
+  projectileTravel: 8
+  fireRange: 7
+  damage: 10
+  collisionDamage: 10
 --- !u!114 &2054157780586921265
 MonoBehaviour:
   m_ObjectHideFlags: 0

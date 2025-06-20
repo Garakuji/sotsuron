@@ -2282,8 +2282,17 @@ MonoBehaviour:
   speed: 0
   health: 0
   maxHealth: 0
-  knockbackForce: 5
+  isPulled: 0
+  knockbackForce: 3
   knockbackDuration: 0.2
+  projectilePrefab: {fileID: 0}
+  projectilePoolIndex: 0
+  attackCooldown: 2
+  projectileSpeed: 5
+  projectileTravel: 8
+  fireRange: 7
+  damage: 10
+  collisionDamage: 10
 --- !u!70 &8214068247943642834
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -2768,7 +2777,7 @@ MonoBehaviour:
     renderer: {fileID: 6230365161890447336}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Eye
     PartSubType: 
@@ -2780,7 +2789,7 @@ MonoBehaviour:
     renderer: {fileID: 3475723227065403464}
     Color:
       serializedVersion: 2
-      rgba: 4280690289
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Eye
     PartSubType: 
@@ -2792,7 +2801,7 @@ MonoBehaviour:
     renderer: {fileID: 6472295347141206448}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Eye
     PartSubType: 
@@ -2804,7 +2813,7 @@ MonoBehaviour:
     renderer: {fileID: 2210367009365186674}
     Color:
       serializedVersion: 2
-      rgba: 4280690289
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2816,7 +2825,7 @@ MonoBehaviour:
     renderer: {fileID: 7165042901769244434}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2828,7 +2837,7 @@ MonoBehaviour:
     renderer: {fileID: 7304039329394121442}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2840,7 +2849,7 @@ MonoBehaviour:
     renderer: {fileID: 1236839143266927759}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2852,7 +2861,7 @@ MonoBehaviour:
     renderer: {fileID: 8142173644666474604}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2864,7 +2873,7 @@ MonoBehaviour:
     renderer: {fileID: 8922261247349638890}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Body
     PartSubType: 
@@ -2876,7 +2885,7 @@ MonoBehaviour:
     renderer: {fileID: 6580083271211169803}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Hair
     PartSubType: 
@@ -2888,7 +2897,7 @@ MonoBehaviour:
     renderer: {fileID: 520146485964249335}
     Color:
       serializedVersion: 2
-      rgba: 4280690289
+      rgba: 4278190080
   - UnitType: Unit
     PartType: FaceHair
     PartSubType: 
@@ -2900,7 +2909,7 @@ MonoBehaviour:
     renderer: {fileID: 8023956079830575702}
     Color:
       serializedVersion: 2
-      rgba: 4280690289
+      rgba: 4278190104
   - UnitType: Unit
     PartType: Cloth
     PartSubType: 
@@ -2912,7 +2921,7 @@ MonoBehaviour:
     renderer: {fileID: 2304187602749387037}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Cloth
     PartSubType: 
@@ -2924,7 +2933,7 @@ MonoBehaviour:
     renderer: {fileID: 3219378536776974090}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Cloth
     PartSubType: 
@@ -2936,7 +2945,7 @@ MonoBehaviour:
     renderer: {fileID: 6414229360067354523}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Pant
     PartSubType: 
@@ -2948,7 +2957,7 @@ MonoBehaviour:
     renderer: {fileID: 4805881375524600375}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Pant
     PartSubType: 
@@ -2960,7 +2969,7 @@ MonoBehaviour:
     renderer: {fileID: 8772621585939672329}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Helmet
     PartSubType: 
@@ -2972,7 +2981,7 @@ MonoBehaviour:
     renderer: {fileID: 3565514001615885683}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Helmet
     PartSubType: 
@@ -2984,7 +2993,7 @@ MonoBehaviour:
     renderer: {fileID: 7264148546522397777}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Armor
     PartSubType: 
@@ -2996,7 +3005,7 @@ MonoBehaviour:
     renderer: {fileID: 7243992537466961732}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Armor
     PartSubType: 
@@ -3008,7 +3017,7 @@ MonoBehaviour:
     renderer: {fileID: 7931367695794071863}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Armor
     PartSubType: 
@@ -3020,7 +3029,7 @@ MonoBehaviour:
     renderer: {fileID: 3030070196635052685}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Back
     PartSubType: 
@@ -3032,7 +3041,7 @@ MonoBehaviour:
     renderer: {fileID: 6609756006157198699}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Sword
@@ -3044,7 +3053,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Sword
@@ -3056,7 +3065,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Axe
@@ -3068,7 +3077,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Axe
@@ -3080,7 +3089,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Bow
@@ -3092,7 +3101,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Bow
@@ -3104,7 +3113,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Shield
@@ -3116,7 +3125,7 @@ MonoBehaviour:
     renderer: {fileID: 2020017047728969738}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Shield
@@ -3128,7 +3137,7 @@ MonoBehaviour:
     renderer: {fileID: 1786594586314862686}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Spear
@@ -3140,7 +3149,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Spear
@@ -3152,7 +3161,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Wand
@@ -3164,7 +3173,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Wand
@@ -3176,7 +3185,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Hammer
@@ -3188,7 +3197,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Hammer
@@ -3200,7 +3209,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Dagger
@@ -3212,7 +3221,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Dagger
@@ -3224,7 +3233,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Mace
@@ -3236,7 +3245,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Mace
@@ -3248,7 +3257,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Others
@@ -3260,7 +3269,7 @@ MonoBehaviour:
     renderer: {fileID: 2156267292048390303}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
   - UnitType: Unit
     PartType: Weapons
     PartSubType: Others
@@ -3272,7 +3281,7 @@ MonoBehaviour:
     renderer: {fileID: 4005376699004558167}
     Color:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4278190080
 --- !u!1 &6437171222776294174
 GameObject:
   m_ObjectHideFlags: 0

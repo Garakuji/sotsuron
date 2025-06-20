@@ -15,5 +15,6 @@ MonoBehaviour:
   id: 9
   prefabId: 9
   icon: {fileID: 21300000, guid: 915247355b1085a4caf3f0122e34cd58, type: 3}
-  description: sdf
+  description: "Summons a field that pulls in enemies;\n levels expand radius and
+    pull force."
   prefab: {fileID: 6250321586615714612, guid: 4f7c4f8b28b239640bbb7ac69ecd8e78, type: 3}

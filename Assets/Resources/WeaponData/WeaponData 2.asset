@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 2
   prefabId: 2
   icon: {fileID: 21300000, guid: 90fc052ac0b97f045a3a1e153e3e723b, type: 3}
-  description: asdf
+  description: 'Strikes random nearby spots for area damage;
+
+    levels add more
+    strikes and raise damage.'
   prefab: {fileID: 1355770508957136281, guid: b3c20d795e0054e48883c04fb1648e65, type: 3}

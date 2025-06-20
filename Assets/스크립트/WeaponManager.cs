@@ -8,6 +8,9 @@ public class WeaponManager : MonoBehaviour
     [Header("무기 설치 위치 (플레이어 트랜스폼)")]
     public Transform weaponParent;
 
+    [Header("최대 장착 무기 개수")]
+    public int maxWeaponCount = 6; // 장착 가능한 최대 무기 수
+
     // 현재 장착된 무기 리스트
     private List<Weapon> weapons = new List<Weapon>();
 
@@ -26,6 +29,14 @@ public class WeaponManager : MonoBehaviour
         if (data == null)
         {
             Debug.LogError("[WeaponManager] WeaponData가 null입니다.");
+            return;
+        }
+
+        // 장착 가능한 최대 개수 검사
+        if (weapons.Find(w => w.id == data.id) == null && weapons.Count >= maxWeaponCount)
+        {
+            Debug.LogWarning($"최대 {maxWeaponCount}개의 무기만 장착할 수 있습니다.");
+            // UI 알림 또는 메시지 호출 등 추가 처리가 필요하면 여기서 실행
             return;
         }
 
@@ -63,5 +74,10 @@ public class WeaponManager : MonoBehaviour
     public Weapon GetWeaponById(int id)
     {
         return weapons.Find(w => w.id == id);
+    }
+
+    public List<Weapon> GetAllWeapons()
+    {
+        return new List<Weapon>(weapons);
     }
 }

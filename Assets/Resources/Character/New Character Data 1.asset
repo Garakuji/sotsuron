@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdbf5e834ad922e4498c472ba4b7a7f6, type: 3}
+  m_Name: New Character Data 1
+  m_EditorClassIdentifier: 
+  characterName: Archer
+  icon: {fileID: 21300000, guid: b36532996f7376b4e98d525f9c229bc6, type: 3}
+  prefab: {fileID: 873986472517863314, guid: 9d2faf76f90574b4bb778287b07015ed, type: 3}
+  maxHealth: 150
+  moveSpeed: 5
+  startingWeapon: {fileID: 11400000, guid: b3bd223f66dd42645ab86693fc7d6d07, type: 2}
+  useRandomWeapon: 0

@@ -16,38 +16,45 @@ public class Repostion : MonoBehaviour
         if (!collision.CompareTag("Area"))
             return;
 
-        Vector3 playerPos = GameManager.Instance.player.transform.position;
+        // 플레이어 위치
+        Vector3 playerPos = GameManager.Instance.player.position;
         Vector3 myPos = transform.position;
+
         float dirX = playerPos.x - myPos.x;
         float dirY = playerPos.y - myPos.y;
-
         float diffX = Mathf.Abs(dirX);
         float diffY = Mathf.Abs(dirY);
 
-        Vector3 playerDir = GameManager.Instance.player.inputVec;
+        // move_test 스크립트에서 입력 벡터 가져오기
+        var moveComp = GameManager.Instance.player.GetComponent<move_test>();
+        Vector3 playerDir = (moveComp != null) ? (Vector3)moveComp.inputVec : Vector3.zero;
 
-        dirX = dirX > 0 ? 1 : -1;
-        dirY = dirY > 0 ? 1 : -1;
+        // 1 또는 -1 로 정규화
+        dirX = dirX > 0 ? 1f : -1f;
+        dirY = dirY > 0 ? 1f : -1f;
 
-        switch (transform.tag)
+        switch (gameObject.tag)
         {
             case "Ground":
                 if (diffX > diffY)
-                {
-                    transform.Translate(Vector3.right * dirX * 80);
-                }
-                else if (diffX < diffY)
-                {
-                    transform.Translate(Vector3.up * dirY * 80);
-                }
+                    transform.Translate(Vector3.right * dirX * 80f);
+                else
+                    transform.Translate(Vector3.up * dirY * 80f);
                 break;
+
             case "Enemy":
                 if (coll.enabled)
                 {
-                    transform.Translate(playerDir * 40 + new Vector3(Random.Range(-3f,3f), Random.Range(-3f, 3f), 0f));
+                    transform.Translate(
+                        playerDir * 40f
+                        + new Vector3(
+                            Random.Range(-3f, 3f),
+                            Random.Range(-3f, 3f),
+                            0f
+                          )
+                    );
                 }
                 break;
         }
-
     }
 }

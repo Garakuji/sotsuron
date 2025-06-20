@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 8
   prefabId: 8
   icon: {fileID: 21300000, guid: 3b4c0914d730d7f41b951d978ab4b640, type: 3}
-  description: 324
+  description: 'Hurls a spear that pierces multiple enemies;
+
+    levels extend range
+    and throw speed.'
   prefab: {fileID: 7795671638159052645, guid: 1d59226a8313aa0439376eb5c162eff9, type: 3}

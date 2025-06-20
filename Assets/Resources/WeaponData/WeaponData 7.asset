@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 7
   prefabId: 7
   icon: {fileID: 21300000, guid: 739d95cb30b0f6c43a567d4362c638ec, type: 3}
-  description: df
+  description: 'Shoots angled blades that leave damaging cut marks;
+
+    levels boost
+    blade damage, count, mark damage, and duration.'
   prefab: {fileID: 6764767796174629351, guid: d7fdb840cb7d8754392c4052725e3bb2, type: 3}

@@ -1,33 +1,46 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class WeaponSlotUI : MonoBehaviour
 {
     public Image icon;
-    private WeaponData weaponData;
+    public Text descriptionText;
 
-    public void Set(WeaponData data)
+    private Button selectorBtn;
+    private WeaponSelectorUI selector;  // ºÎ¸ð UI
+
+    void Awake()
     {
-        weaponData = data;
-
-        if (icon != null && data.icon != null)
-            icon.sprite = data.icon;
-
-        Debug.Log($"WeaponData Set ì™„ë£Œ - ID: {data.id}");
-
-        // í˜¹ì‹œ ëª¨ë¥¼ ì¤‘ë³µ ë¦¬ìŠ¤ë„ˆ ë°©ì§€
-        GetComponent<Button>().onClick.RemoveAllListeners();
-        GetComponent<Button>().onClick.AddListener(OnClick);
+        selectorBtn = GetComponent<Button>();
+        selector = GetComponentInParent<WeaponSelectorUI>();
     }
 
-    public void OnClick()
+    public void SetWeapon(WeaponData data)
     {
-        if (weaponData == null)
-        {
-            Debug.LogError("ì„ íƒëœ WeaponDataê°€ nullìž…ë‹ˆë‹¤.");
-            return;
-        }
+        // ¾ÆÀÌÄÜ¡¤ÅØ½ºÆ® ¼¼ÆÃ
+        icon.sprite = data.icon;
+        descriptionText.text = data.description;
 
-        GameManager.Instance.weaponSelector.OnWeaponSelected(weaponData);
+        // Å¬¸¯ ¸®½º³Ê: Àý´ë AddOrLevelupWeapon Á÷Á¢ È£Ãâ ±ÝÁö!
+        selectorBtn.onClick.RemoveAllListeners();
+        selectorBtn.onClick.AddListener(() =>
+        {
+            // 1) Å¬¸¯ À½¼º Àç»ý
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.menuSelectClip);
+
+            // 2) ·¹º§¾÷ UI µ¿ÀÛ
+            selector.OnWeaponSelected(data);
+        });
+
+        selectorBtn.interactable = true;
+    }
+
+    public void Clear()
+    {
+        selectorBtn.onClick.RemoveAllListeners();
+        selectorBtn.interactable = false;
+        icon.sprite = null;
+        descriptionText.text = "";
     }
 }

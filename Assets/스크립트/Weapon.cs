@@ -56,10 +56,10 @@ public class Weapon : MonoBehaviour
     public float fieldRadius = 2f;
 
     [Header("Shockwave Hammer Stats")]
-    public float hammerMaxRadius   = 2f;
+    public float hammerMaxRadius   = 3f;
     public float hammerExpandTime  = 0.3f;
     public float hammerKnockback   = 8f;
-    public int   hammerDamage      = 2;
+    public int   hammerDamage      = 4;
 
     [Header("Shockwave Hammer Leveling")]
     public float hammerBaseRadius        = 4f;
@@ -70,6 +70,15 @@ public class Weapon : MonoBehaviour
     public float hammerKnockbackPerLevel = 1f;
     public int   hammerBaseDamage        = 3;
     public int   hammerDamagePerLevel    = 1;
+
+    [Header("Chain Brand Stats")]
+    public float brandRadius = 3f;
+    public float brandDuration = 3f;
+    public float brandTickInterval = 0.5f;
+    public float brandTickDamage = 2f;
+    public float brandSlowAmount = 0.3f;
+    public int brandMaxTargets = 1; // 레벨당 적용 대상 수 증가
+    private float brandTimer;
 
     private Vector3 _originalScale;
 
@@ -203,6 +212,16 @@ public class Weapon : MonoBehaviour
                     FireShockwaveHammer();
                 }
                 break;
+
+            case 11: // 연쇄 낙인
+                FollowPlayer();
+                brandTimer += Time.deltaTime;
+                if (brandTimer >= speed)
+                {
+                    brandTimer = 0f;
+                    ApplyChainBrand();
+                }
+                break;
             default:
                 FollowPlayer();
                 break;
@@ -270,7 +289,6 @@ public class Weapon : MonoBehaviour
 
             case 6:
                 damage = 10f + 3f * (level - 1);
-                count = 1 + ((level >= 2) ? 1 : 0);
                 speed = Mathf.Max(1.5f - 0.2f * (level - 1), 0.5f);
                 break;
 
@@ -311,6 +329,12 @@ public class Weapon : MonoBehaviour
                 // 쿨다운 5%씩 감소, 최소 0.2초
                 speed = 2f;
                 break;
+            case 11: // Chain Brand
+                brandTickDamage = 1.5f + level; // 틱 데미지 증가
+                brandMaxTargets = Mathf.Min(level, 3);      // 레벨당 대상 수 증가 (1 → 7)
+                speed = 2.5f;
+                break;
+
 
         }
     }
@@ -631,6 +655,31 @@ private void FireShockwaveHammer()
         hammer.FireFollow(player);
     }
 }
+    void ApplyChainBrand()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(player.position, brandRadius, LayerMask.GetMask("Enemy"));
+        int applied = 0;
+
+        foreach (var hit in hits)
+        {
+            if (applied >= brandMaxTargets) break;
+
+            Enemy enemy = hit.GetComponent<Enemy>();
+            if (enemy != null && !enemy.HasDebuff("ChainBrand"))
+            {
+                enemy.ApplyChainBrand(
+                    brandDuration,
+                    brandTickDamage,
+                    brandTickInterval,
+                    brandSlowAmount
+                );
+
+                // 이펙트 출력
+                ChainBrandManager.Instance?.PlayApplyVFX(enemy.transform.position);
+                applied++;
+            }
+        }
+    }
 
 
 }

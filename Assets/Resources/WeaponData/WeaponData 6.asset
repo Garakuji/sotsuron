@@ -15,5 +15,8 @@ MonoBehaviour:
   id: 6
   prefabId: 6
   icon: {fileID: 21300000, guid: f52ff8ebd29b8c9428d9bfba48750377, type: 3}
-  description: asdf
+  description: 'Swings a melee attack forward;
+
+    levels increase damage and attack
+    speed.'
   prefab: {fileID: 2782959583680348544, guid: 8699a4b25b3e79046a5bb7c852bd97c2, type: 3}
