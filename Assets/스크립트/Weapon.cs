@@ -54,6 +54,8 @@ public class Weapon : MonoBehaviour
     public float fieldDuration = 3f;
     public float fieldPullForce = 10f;
     public float fieldRadius = 2f;
+    public float fieldmaxRadius = 2.5f;
+    public float fieldDamage = 3f;
 
     [Header("Shockwave Hammer Stats")]
     public float hammerMaxRadius   = 3f;
@@ -84,8 +86,21 @@ public class Weapon : MonoBehaviour
 
     void Awake()
     {
-        if (player == null && GameManager.Instance != null)
-            player = GameManager.Instance.player.transform;
+        // 1) weaponParent 가 있으면 이걸 쓰고
+        if (WeaponManager.Instance != null && WeaponManager.Instance.weaponParent != null)
+        {
+            player = WeaponManager.Instance.weaponParent;
+        }
+        // 2) 없으면 (혹시 예전 코드 호환용으로) GameManager 의 player 를 시도해 보고
+        else if (GameManager.Instance != null && GameManager.Instance.player != null)
+        {
+            player = GameManager.Instance.player;
+        }
+        else
+        {
+            Debug.LogError("[Weapon] 부모가 할당되지 않았습니다! SpawnPlayer() 순서를 확인하세요.");
+        }
+
         _originalScale = transform.localScale;
     }
 
@@ -315,6 +330,7 @@ public class Weapon : MonoBehaviour
                 fieldPullForce = 8f + 2f * (level - 1);
                 fieldRadius = 0.5f + 0.2f * (level - 1);
                 speed = Mathf.Max(3f - 0.1f * (level - 1), 1f);
+                fieldRadius = Mathf.Min(fieldRadius, fieldmaxRadius);
                 break;
 
             case 10: // Shockwave Hammer 레벨업 처리
@@ -631,7 +647,7 @@ public class Weapon : MonoBehaviour
         var field = fieldObj.GetComponent<AttractionField>();
         if (field != null)
         {
-            field.Init(fieldDuration, fieldPullForce, fieldRadius);
+            field.Init(fieldDuration, fieldPullForce, fieldRadius,fieldDamage);
         }
 
         fieldObj.SetActive(true);

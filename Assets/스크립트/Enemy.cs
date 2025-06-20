@@ -50,6 +50,10 @@ public class Enemy : MonoBehaviour
 
     [Tooltip("죽었을 때 드랍할 Exp Orb 개수")]
     public int expOrbCount = 1;
+
+    [Header("Hit SFX Cooldown")]
+    public float hitSfxCooldown = 1f;    // 0.2초에 한 번만 사운드
+    private float _lastHitSfxTime = 0f;
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -225,7 +229,11 @@ public class Enemy : MonoBehaviour
         if (!isLive) return;
 
         health -= dmg;
-        AudioManager.Instance.PlayEnemyHit();
+        if (Time.time - _lastHitSfxTime >= hitSfxCooldown)
+        {
+            AudioManager.Instance.PlayEnemyHit();
+            _lastHitSfxTime = Time.time;
+        }
         if (health <= 0f)
         {
             TransmitChainBrand();

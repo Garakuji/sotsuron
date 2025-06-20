@@ -15,7 +15,7 @@ MonoBehaviour:
   characterName: Mage
   icon: {fileID: 21300000, guid: 5fa01d209ea0fdd4a8b7363253874d90, type: 3}
   prefab: {fileID: 4229829720949661739, guid: be4db80b64e5749428aad7f99c97a12a, type: 3}
-  maxHealth: 150
+  maxHealth: 350
   moveSpeed: 4
   startingWeapon: {fileID: 11400000, guid: 052f7cda270419f4f81c088b274ba852, type: 2}
   useRandomWeapon: 0

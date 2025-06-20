@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static GameManager Instance { get; private set; }
 
     [Header("# Game Control")]
     public float GameTime;
@@ -78,11 +78,22 @@ public class GameManager : MonoBehaviour
 
     private void SpawnPlayer()
     {
-        // 1) 인스턴스화
+        WeaponManager.Instance.ResetAllWeapons();
+        // (A) 씬에 남아 있는 모든 "Player" 태그 오브젝트를 지운다
+        var olds = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var o in olds)
+        {
+            // 지금 막 GetComponent<Transform>()으로 참조된
+            // GameManager.Instance.player 와는 별개이니 안전.
+            Destroy(o);
+        }
+
+        // (2) --- 이제 새로 생성
         var go = Instantiate(selectedCharacter.prefab);
         go.name = "Player";
+        go.tag = "Player";            // 태그가 prefab에 안 붙어 있을 수도 있으니
         player = go.transform;
-
+        WeaponManager.Instance.weaponParent = player;
         // 2) 스탯 세팅
         maxHealth = selectedCharacter.maxHealth;
         health = maxHealth;
@@ -127,9 +138,13 @@ public class GameManager : MonoBehaviour
             exp -= GetRequiredExp(level);
             level++;
             leveledUp = true;
+            // 레벨업 시 체력 10 회복 (최대 체력 초과 방지)
+            health = Mathf.Min(maxHealth, health + 10);
+
         }
         if (leveledUp)
         {
+
             AudioManager.Instance.PlayLevelUp();
             ShowLevelUpChoices();
         }
@@ -168,7 +183,6 @@ public class GameManager : MonoBehaviour
 
         // 2) 피격 애니메이션 및 플래시
         if (playerAnim != null)
-            playerAnim.SetTrigger("3_Damaged");
         StartCoroutine(PlayerFlash());
         AudioManager.Instance.PlayPlayerHit();
         // 3) 사망 체크
@@ -210,5 +224,10 @@ public class GameManager : MonoBehaviour
         else
             Debug.LogError("[GameManager] ResultUI를 찾을 수 없습니다!");
     }
-
+    private void OnDestroy()
+    {
+        // 자신이 현재 Instance 라면, static 필드를 비웁니다.
+        if (Instance == this)
+            Instance = null;
+    }
 }

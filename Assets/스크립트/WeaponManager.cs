@@ -14,10 +14,29 @@ public class WeaponManager : MonoBehaviour
     // 현재 장착된 무기 리스트
     private List<Weapon> weapons = new List<Weapon>();
 
+    /// <summary>
+    /// 메뉴로 돌아가거나 새 게임을 시작하기 전에,
+    /// 모든 무기 데이터를 삭제하고 리스트도 비웁니다.
+    /// </summary>
+    public void ResetAllWeapons()
+    {
+        // 1) 씬에 남아있는 Weapon 컴포넌트(오브젝트)도 파괴
+        foreach (var w in weapons)
+        {
+            if (w != null)
+                Destroy(w.gameObject);
+        }
+
+        // 2) 내부 리스트 초기화
+        weapons.Clear();
+    }
+
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
     }
 
     /// <summary>
@@ -80,4 +99,5 @@ public class WeaponManager : MonoBehaviour
     {
         return new List<Weapon>(weapons);
     }
+
 }

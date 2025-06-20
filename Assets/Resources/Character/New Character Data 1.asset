@@ -15,7 +15,7 @@ MonoBehaviour:
   characterName: Archer
   icon: {fileID: 21300000, guid: b36532996f7376b4e98d525f9c229bc6, type: 3}
   prefab: {fileID: 873986472517863314, guid: 9d2faf76f90574b4bb778287b07015ed, type: 3}
-  maxHealth: 150
+  maxHealth: 300
   moveSpeed: 5
   startingWeapon: {fileID: 11400000, guid: b3bd223f66dd42645ab86693fc7d6d07, type: 2}
   useRandomWeapon: 0

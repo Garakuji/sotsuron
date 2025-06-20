@@ -1,5 +1,4 @@
-﻿// ===== AttractionField.cs =====
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CircleCollider2D))]
@@ -8,6 +7,7 @@ public class AttractionField : MonoBehaviour
     [HideInInspector] public float duration;
     [HideInInspector] public float pullSpeed;
     [HideInInspector] public float radius;
+    [HideInInspector] public float damagePerSecond;
 
     public LayerMask targetLayer;
 
@@ -40,46 +40,49 @@ public class AttractionField : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-void FixedUpdate()
-{
-    // 레이어 마스크 없이 모든 콜라이더 검색
-    Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
-
-    foreach (var hit in hits)
+    void FixedUpdate()
     {
-        // 태그가 Enemy인 것만 끌기
-        if (!hit.CompareTag("Enemy"))
-            continue;
+        // 레이어 마스크 없이 모든 콜라이더 검색
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
 
-        var enemy = hit.GetComponent<Enemy>();
-        if (enemy == null) continue;
-
-        enemy.isPulled = true;
-
-
-        // 끌어당김 로직...
-        var rb = hit.attachedRigidbody;
-        if (rb != null)
+        foreach (var hit in hits)
         {
-            Vector2 dir = ((Vector2)transform.position - rb.position).normalized;
-            Vector2 newPos = rb.position + dir * pullSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(newPos);
-        }
-        else
-        {
-            Transform t = hit.transform;
-            Vector2 dir = ((Vector2)transform.position - (Vector2)t.position).normalized;
-            t.position = Vector2.MoveTowards(t.position, transform.position, pullSpeed * Time.fixedDeltaTime);
+            // 태그가 Enemy인 것만 끌기
+            if (!hit.CompareTag("Enemy"))
+                continue;
+
+            var enemy = hit.GetComponent<Enemy>();
+            if (enemy == null) continue;
+
+            enemy.isPulled = true;
+
+            float dmgThisFrame = damagePerSecond * Time.fixedDeltaTime;
+            enemy.TakeDamage(dmgThisFrame, transform.position);
+
+            // 끌어당김 로직...
+            var rb = hit.attachedRigidbody;
+            if (rb != null)
+            {
+                Vector2 dir = ((Vector2)transform.position - rb.position).normalized;
+                Vector2 newPos = rb.position + dir * pullSpeed * Time.fixedDeltaTime;
+                rb.MovePosition(newPos);
+            }
+            else
+            {
+                Transform t = hit.transform;
+                Vector2 dir = ((Vector2)transform.position - (Vector2)t.position).normalized;
+                t.position = Vector2.MoveTowards(t.position, transform.position, pullSpeed * Time.fixedDeltaTime);
+            }
         }
     }
-}
 
 
-    public void Init(float duration, float pullSpeed, float radius)
+    public void Init(float duration, float pullSpeed, float radius, float damagePerSecond)
     {
         this.duration = duration;
         this.pullSpeed = pullSpeed;
         this.radius = radius;
+        this.damagePerSecond = damagePerSecond;
 
         _col.radius = radius;
         float diameter = radius * 2f;

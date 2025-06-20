@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -8,7 +8,10 @@ public class AudioManager : MonoBehaviour
 
     [Header("BGM")]
     public AudioClip bgmClip;
-    [Range(0f, 1f)] public float bgmVolume = 0.25f;
+    [Range(0f, 1f)] public float bgmVolume = 0.1f;
+
+    [Header("SFX")]
+    [Range(0f, 1f)] public float sfxVolume = 1f;
 
     [Header("Player VO")]
     public AudioClip[] playerHitClips;
@@ -24,8 +27,9 @@ public class AudioManager : MonoBehaviour
     private AudioSource musicSource;
     private AudioSource sfxSource;
 
-    // ¹ÙÀÎµùÇÒ ½½¶óÀÌ´õ
+    // ë°”ì¸ë”©í•  ìŠ¬ë¼ì´ë”
     private Slider _bgmSlider;
+    private Slider _sfxSlider;
 
     void Awake()
     {
@@ -41,10 +45,14 @@ public class AudioManager : MonoBehaviour
             musicSource.Play();
 
             sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.volume = sfxVolume;
 
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void OnDestroy()
@@ -54,8 +62,8 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // (1) QuitButton ´Ù½Ã ¹ÙÀÎµù
-        var quitGO = GameObject.Find("Canvas/Button");
+        // (1) QuitButton ë‹¤ì‹œ ë°”ì¸ë”©
+        var quitGO = GameObject.Find("Canvas/QuitButton");
         if (quitGO != null && quitGO.TryGetComponent<Button>(out var quitBtn))
         {
             quitBtn.onClick.RemoveAllListeners();
@@ -66,18 +74,24 @@ public class AudioManager : MonoBehaviour
             });
         }
 
-        // (2) BGM Slider ´Ù½Ã ¹ÙÀÎµù
-        // ¡ÚHierarchy °æ·Î´Â ÇÁ·ÎÁ§Æ®¿¡ ¸Â°Ô ¹Ù²ãÁÖ¼¼¿ä.
-        // ¿¹) Canvas/SettingsPanel/BGMSlider
-        var sliderGO = GameObject.Find("Canvas/Slider");
-        if (sliderGO != null && sliderGO.TryGetComponent<Slider>(out var slider))
+        // (2) BGM Slider ë‹¤ì‹œ ë°”ì¸ë”©
+        var bgmSliderGO = GameObject.Find("Canvas/BGMSlider");
+        if (bgmSliderGO != null && bgmSliderGO.TryGetComponent<Slider>(out var bgmSlider))
         {
-            _bgmSlider = slider;
-            // ÃÊ±â°ª µ¿±âÈ­
+            _bgmSlider = bgmSlider;
             _bgmSlider.value = bgmVolume;
-            // ¸®½º³Ê Àçµî·Ï
             _bgmSlider.onValueChanged.RemoveAllListeners();
             _bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+        }
+
+        // (3) SFX Slider ë‹¤ì‹œ ë°”ì¸ë”©
+        var sfxSliderGO = GameObject.Find("Canvas/SFXSlider");
+        if (sfxSliderGO != null && sfxSliderGO.TryGetComponent<Slider>(out var sfxSlider))
+        {
+            _sfxSlider = sfxSlider;
+            _sfxSlider.value = sfxVolume;
+            _sfxSlider.onValueChanged.RemoveAllListeners();
+            _sfxSlider.onValueChanged.AddListener(SetSFXVolume);
         }
     }
 
@@ -86,6 +100,13 @@ public class AudioManager : MonoBehaviour
         bgmVolume = Mathf.Clamp01(volume);
         if (musicSource != null)
             musicSource.volume = bgmVolume;
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        sfxVolume = Mathf.Clamp01(volume);
+        if (sfxSource != null)
+            sfxSource.volume = sfxVolume;
     }
 
     public void PlaySFX(AudioClip clip)
@@ -104,7 +125,12 @@ public class AudioManager : MonoBehaviour
     public void PlayLevelUp() => PlaySFX(levelUpClip);
     public void PlayPlayerDeath() => PlaySFX(playerDeathClip);
     public void PlayEnemyHit() => PlayRandomSFX(enemyHitClips);
-    public void PlayMenuSelect() => PlaySFX(menuSelectClip);
+
+    public void PlayMenuSelect()
+    {
+        if (menuSelectClip == null) return;
+        sfxSource.PlayOneShot(menuSelectClip, 0.5f);
+    }
 
     public void QuitGame()
     {

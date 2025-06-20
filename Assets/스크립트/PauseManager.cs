@@ -44,11 +44,21 @@ public class PauseManager : MonoBehaviour
     }
 
     // Quit 버튼 (메인 메뉴로 돌아가기)
+
     public void OnQuitToMenu()
     {
-        Time.timeScale = 1f;
-        AudioManager.Instance.PlaySFX(AudioManager.Instance.menuSelectClip);
-        // "CharacterSelect" 씬 이름에 맞춰 변경
-        SceneManager.LoadScene("CharacterSelectScene");
+            // 1) 일시정지 해제
+            Time.timeScale = 1f;
+
+            // 2) 버튼 선택 효과음
+            AudioManager.Instance.PlayMenuSelect();
+
+            // 3) GameManager 파괴 (OnDestroy에서 Instance=null 이 자동으로 됩니다)
+            if (GameManager.Instance != null)
+                Destroy(GameManager.Instance.gameObject);
+
+            // 4) 캐릭터 선택 씬 로드
+            SceneManager.LoadScene("CharacterSelectScene");
     }
+
 }
