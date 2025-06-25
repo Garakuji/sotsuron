@@ -11,6 +11,9 @@ public class ResultUI : MonoBehaviour
 
     void Start()
     {
+        Cursor.visible = true;             // 마우스 커서 보이기
+        Cursor.lockState = CursorLockMode.None;  // 커서 고정 해제 (자유롭게 이동 가능하게)
+
         restartButton.onClick.AddListener(OnRestartButton);
     }
 
